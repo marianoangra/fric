@@ -127,8 +127,8 @@ input,select,textarea,.btn{min-height:50px}
       <div class="step" data-s="2">
         <label for="igav">Instagram do seu avatar</label>
         <input id="igav" name="instagram_avatar" autocapitalize="none" placeholder="@seuavatar" required>
-        <label for="site">Site ou Instagram do seu negócio</label>
-        <input id="site" name="negocio" autocapitalize="none" placeholder="@seunegocio ou www.seusite.com.br" required>
+        <label for="site">Site do seu negócio <span class="opt">(opcional)</span></label>
+        <input id="site" name="negocio" autocapitalize="none" placeholder="www.seusite.com.br">
         <label for="vende">O que você vende?</label>
         <textarea id="vende" name="vende" placeholder="Ex.: iPhones novos e seminovos, aluguel por temporada, miniaturas 3D" required></textarea>
         <label class="check"><input type="checkbox" id="ok" required> Sou o responsável pelo perfil e pelo negócio, e concordo que o avatar seja identificado como IA na comunidade.</label>
@@ -214,7 +214,6 @@ function valid(n) {
   }
   if (n === 2) {
     if (v("igav").replace("@", "").length < 2) return "Informe o Instagram do avatar.";
-    if (!v("site")) return "Informe o site ou Instagram do seu negócio.";
     if (!v("vende")) return "Conte o que você vende.";
   }
   if (n === 2 && !document.getElementById("ok").checked) return "Marque a caixa de autorização para continuar.";
