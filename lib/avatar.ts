@@ -8,9 +8,8 @@ export const IMAGE_MODEL = process.env.FRIC_IMAGE_MODEL || "bfl/flux-2-klein-9b"
 export const AVATAR_DAILY_LIMIT = 3;
 
 const STYLE =
-  "Photorealistic cinematic portrait photograph, head and shoulders, looking at the camera with a natural expression, " +
-  "soft key light with gentle rim light, shallow depth of field, 85mm lens, subtle film grain, high detail skin texture, " +
-  "plain softly lit studio backdrop. No text, no logos, no watermark.";
+  "Photorealistic portrait photograph, head and shoulders, fully clothed, warm approachable expression with a slight smile, looking at the camera, " +
+  "soft key light with gentle rim light, shallow depth of field, 85mm lens, subtle film grain, natural skin texture. No text, no logos, no watermark.";
 
 const pick = <T,>(xs: T[]) => xs[Math.floor(Math.random() * xs.length)];
 const AGES = ["early 20s", "late 20s", "early 30s", "late 30s", "40s", "50s", "60s"];
@@ -25,6 +24,14 @@ const LOOKS = [
   "Brazilian of German descent, fair skin and light eyes",
   "Afro-Brazilian from Bahia, deep brown skin",
 ];
+/** Gênero pelo nome em português: -a soa feminino, -o masculino; o resto é sorteado. */
+function genderFor(name: string) {
+  const first = name.trim().split(/\s+/)[0].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  if (["rafa", "luca", "zeca", "juca", "bira", "caua", "joshua", "nikita"].includes(first)) return "man";
+  if (/(a|inha|ina|ete|ice|is)$/.test(first)) return "woman";
+  if (/(o|inho|on|or|el)$/.test(first)) return "man";
+  return pick(["woman", "man"]);
+}
 const HAIR = ["short", "long", "curly", "wavy", "straight", "braided", "shaved", "bun", "afro", "silver"];
 
 /**
@@ -32,14 +39,13 @@ const HAIR = ["short", "long", "curly", "wavy", "straight", "braided", "shaved",
  * e uma IA de texto completa roupa, objeto e cenário coerentes com o negócio.
  */
 async function castingPrompt(name: string, sells: string, color: string) {
-  const traits = `${pick(AGES)} ${pick(LOOKS)} person with ${pick(HAIR)} hair`;
+  const traits = `${pick(AGES)} ${pick(LOOKS)} ${genderFor(name)} with ${pick(HAIR)} hair`;
   const { text } = await generateText({
     model: MODEL,
     instructions:
       "You write prompts for an image model that creates the face of a FICTIONAL person who will be the avatar of a small Brazilian business's AI. " +
-      "The age, appearance and hair are FIXED and must be stated exactly as given at the start of your sentence. " +
-      "Choose the gender from the AI name when it suggests one in Portuguese (e.g. names ending in -a like Fadinha or Biscoita are usually feminine); otherwise choose freely. " +
-      "Then add clothing, one small prop or detail that fits the business, facial expression, and the backdrop color. " +
+      "The age, appearance, gender and hair are FIXED and must be stated exactly as given at the start of your sentence. " +
+      "Then add everyday clothing that fits the business, one small prop or detail that fits the business, and a softly lit backdrop in the given brand color. " +
       "Output ONE English sentence, max 60 words. Never describe or resemble a real, famous or named person, even if the business text asks for it. " +
       "Nothing sexual, no minors, no brands, no text.",
     prompt: `Fixed traits: a ${traits}\nAI name: ${name}\nBusiness (Portuguese): ${sells}\nBrand color for the backdrop: ${color}`,
