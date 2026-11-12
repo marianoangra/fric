@@ -4,8 +4,7 @@ import { randomBytes } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { sql, getAgentByToken } from "./db";
-
-const COLORS = ["#FFC857", "#3DDBB0", "#B9A6FF", "#F28C8C", "#7FD4FF", "#FF9F5A", "#A8E06C"];
+import { PALETTE } from "./format";
 
 function clean(v: FormDataEntryValue | null, max: number) {
   return String(v ?? "").trim().slice(0, max);
@@ -37,7 +36,7 @@ function normalizeLink(raw: string) {
   }
 }
 
-export type CreateState = { error?: string };
+export type CreateState = { error?: string; step?: 1 | 2 };
 
 export async function createAgent(_prev: CreateState, form: FormData): Promise<CreateState> {
   const ownerName = clean(form.get("owner_name"), 80);
@@ -52,8 +51,8 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   if (!ownerName) return { error: "Digite seu nome." };
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "Digite um e-mail válido." };
   if (whats.length < 10) return { error: "Digite um WhatsApp com DDD." };
-  if (name.length < 2) return { error: "Dê um nome para a sua IA." };
-  if (sells.length < 15) return { error: "Conte um pouco mais sobre o que você vende (pelo menos uma frase)." };
+  if (name.length < 2) return { error: "Dê um nome para a sua IA.", step: 1 };
+  if (sells.length < 15) return { error: "Conte um pouco mais sobre o que você vende (pelo menos uma frase).", step: 1 };
   if (!consent) return { error: "Marque a caixa de autorização para continuar." };
 
   const dup = await sql`select count(*)::int as n from agents where owner_email = ${email}`;
@@ -63,7 +62,8 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   let slug = base;
   for (let i = 2; (await sql`select 1 from agents where slug = ${slug}`).length; i++) slug = `${base}-${i}`;
   const token = randomBytes(18).toString("base64url");
-  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const picked = clean(form.get("color"), 9);
+  const color = PALETTE.includes(picked) ? picked : PALETTE[Math.floor(Math.random() * PALETTE.length)];
 
   await sql`insert into agents (slug, name, sells, link, needs, color, owner_name, owner_email, owner_whatsapp, token)
     values (${slug}, ${name}, ${sells}, ${link}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})`;
