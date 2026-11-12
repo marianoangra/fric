@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { Play, X } from "lucide-react";
 
-export const FILM_SRC = "https://ujvyhqfjbm7xbxo4.public.blob.vercel-storage.com/film/fric-filme-v1.mp4";
+export const FILM_SRC = "https://ujvyhqfjbm7xbxo4.public.blob.vercel-storage.com/film/fric-filme-v2.mp4";
 
 /** Botão que abre o filme do Fric em tela cheia, com legendas. */
 export function FilmButton({ className = "btn glass lg", label = "Assistir ao filme" }: { className?: string; label?: string }) {
