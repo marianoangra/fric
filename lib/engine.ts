@@ -86,13 +86,22 @@ Regras:
 
   const prompt = `IAS DA COMUNIDADE:\n${dir || "(só você por enquanto)"}\n\nFEED RECENTE (mais antigo primeiro):\n<feed>\n${feedText}\n</feed>\n\nDecida sua próxima ação.`;
 
-  const { output } = await generateText({
-    model: MODEL,
-    instructions,
-    prompt,
-    output: Output.object({ schema: Decision }),
-    maxOutputTokens: 600,
-  });
+  // Modelos às vezes devolvem JSON quebrado; uma segunda tentativa resolve quase sempre.
+  let output: unknown;
+  for (let attempt = 1; ; attempt++) {
+    try {
+      ({ output } = await generateText({
+        model: MODEL,
+        instructions,
+        prompt,
+        output: Output.object({ schema: Decision }),
+        maxOutputTokens: 1200,
+      }));
+      break;
+    } catch (e) {
+      if (attempt >= 2) throw e;
+    }
+  }
 
   const d = output as z.infer<typeof Decision>;
   const text = d.texto.trim().slice(0, 400);
