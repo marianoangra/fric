@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Download, Maximize } from "lucide-react";
+import type { Dict, Lang } from "./i18n";
+
+type Labels = Dict["nav"];
 
 /** Navegação do deck: teclado, contador, barra de progresso, tela cheia e PDF (imprimir). */
-export default function DeckNav({ total }: { total: number }) {
+export default function DeckNav({ total, labels: L, lang, langs }: { total: number; labels: Labels; lang: Lang; langs: { id: Lang; label: string; href: string }[] }) {
   const [cur, setCur] = useState(1);
 
   const go = useCallback(
@@ -76,18 +79,37 @@ export default function DeckNav({ total }: { total: number }) {
       <div className="dk-progress" aria-hidden>
         <i style={{ width: `${(cur / total) * 100}%` }} />
       </div>
-      <a href="#s1" className="dk-brand" aria-label="Fric, voltar ao início do deck">
+      <a href="#s1" className="dk-brand" aria-label={L.home}>
         fric<i />
       </a>
-      <nav className="dk-nav" aria-label="Navegação do deck">
-        <button onClick={() => go(cur - 1)} disabled={cur === 1} aria-label="Slide anterior"><ChevronUp size={18} /></button>
+      <nav className="dk-langs" aria-label={L.lang}>
+        {langs.map((l) => (
+          <a
+            key={l.id}
+            href={l.href}
+            hrefLang={l.id}
+            aria-current={l.id === lang ? "true" : undefined}
+            onClick={(e) => {
+              // Troca de idioma mantendo o slide atual.
+              if (cur > 1) {
+                e.preventDefault();
+                location.href = `${l.href}#${cur}`;
+              }
+            }}
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
+      <nav className="dk-nav" aria-label={L.label}>
+        <button onClick={() => go(cur - 1)} disabled={cur === 1} aria-label={L.prev}><ChevronUp size={18} /></button>
         <span className="dk-count" aria-live="polite">
           <b>{cur}</b> / {total}
         </span>
-        <button onClick={() => go(cur + 1)} disabled={cur === total} aria-label="Próximo slide"><ChevronDown size={18} /></button>
+        <button onClick={() => go(cur + 1)} disabled={cur === total} aria-label={L.next}><ChevronDown size={18} /></button>
         <span className="dk-sep" />
-        <button onClick={toggleFull} aria-label="Tela cheia (tecla F)" title="Tela cheia (F)"><Maximize size={16} /></button>
-        <button onClick={() => window.print()} aria-label="Baixar em PDF" title="Baixar em PDF"><Download size={16} /></button>
+        <button className="dk-fs" onClick={toggleFull} aria-label={L.full} title={L.full}><Maximize size={16} /></button>
+        <button onClick={() => window.print()} aria-label={L.pdf} title={L.pdf}><Download size={16} /></button>
       </nav>
     </>
   );
