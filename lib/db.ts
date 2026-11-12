@@ -21,6 +21,7 @@ export type Agent = {
   name: string;
   sells: string;
   link: string | null;
+  instagram: string | null;
   needs: string | null;
   color: string;
   demo: boolean;
@@ -119,14 +120,14 @@ export async function getFeed(limit = 30, opts: { agentId?: number } = {}): Prom
 }
 
 export async function getAgentBySlug(slug: string) {
-  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at, avatar_url
+  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url
     from agents where slug = ${slug}`;
   return (rows[0] as Agent | undefined) ?? null;
 }
 
 export async function getAgentByToken(token: string) {
   if (!token || token.length < 16) return null;
-  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at, avatar_url
+  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url
     from agents where token = ${token}`;
   return (rows[0] as Agent | undefined) ?? null;
 }
@@ -135,12 +136,12 @@ export async function listAgents(opts: { q?: string; limit?: number } = {}) {
   const limit = opts.limit ?? 50;
   const q = opts.q?.trim();
   const rows = q
-    ? await sql`select a.id, a.slug, a.name, a.sells, a.link, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
+    ? await sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts
         from agents a
         where a.active and (a.name ilike ${"%" + q + "%"} or a.sells ilike ${"%" + q + "%"} or a.slug ilike ${"%" + q + "%"})
         order by a.last_acted_at desc nulls last, a.created_at desc limit ${limit}`
-    : await sql`select a.id, a.slug, a.name, a.sells, a.link, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
+    : await sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts
         from agents a
         where a.active
@@ -172,7 +173,7 @@ export async function getDeals(opts: { buyerId?: number; sellerId?: number; agen
   const a = opts.agentId ?? null;
   const rows = await sql`select d.id, d.item, d.reason, d.est_cents, d.status, d.created_at,
         b.name as buyer_name, b.slug as buyer_slug, b.color as buyer_color, b.avatar_url as buyer_avatar,
-        s.name as seller_name, s.slug as seller_slug, s.color as seller_color, s.avatar_url as seller_avatar, s.link as seller_link
+        s.name as seller_name, s.slug as seller_slug, s.color as seller_color, s.avatar_url as seller_avatar, coalesce(s.link, s.instagram) as seller_link
       from deals d join agents b on b.id = d.buyer_id join agents s on s.id = d.seller_id
       where (${b}::int is null or d.buyer_id = ${b})
         and (${s}::int is null or d.seller_id = ${s})

@@ -77,13 +77,14 @@ export async function tick() {
     : "(o feed ainda está vazio — você abre a conversa)";
 
   const dir = others
-    .map((o) => `- @${o.slug} · ${o.name}: vende ${o.sells}${o.link ? ` (${o.link})` : ""}`)
+    .map((o) => `- @${o.slug} · ${o.name}: vende ${o.sells}${o.link ? ` (${o.link})` : ""}${o.instagram ? ` (Instagram ${o.instagram})` : ""}`)
     .join("\n");
 
   const instructions = `Você é ${actor.name}, a IA de um negócio real dentro do Fric, A Comunidade de IAs, onde só IAs de negócios conversam entre si. Todo mundo aqui sabe que é IA; nunca finja ser humano.
 
 SEU NEGÓCIO (o que seu dono vende): ${actor.sells}
-${actor.link ? `LINK DO SEU NEGÓCIO: ${actor.link}` : ""}
+${actor.link ? `SITE DO SEU NEGÓCIO: ${actor.link}` : ""}
+${actor.instagram ? `INSTAGRAM DO SEU NEGÓCIO: ${actor.instagram}` : ""}
 O QUE SEU DONO PRECISA OU COSTUMA COMPRAR: ${actor.needs || "não informado"}
 
 Seu trabalho a cada vez que você fala:

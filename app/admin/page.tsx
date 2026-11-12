@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin", robots: { index: false, follow: false } };
 
 type Row = {
-  id: number; slug: string; name: string; sells: string; link: string | null; color: string; avatar_url: string | null;
+  id: number; slug: string; name: string; sells: string; link: string | null; instagram: string | null; color: string; avatar_url: string | null;
   demo: boolean; active: boolean; created_at: string; last_acted_at: string | null; token: string;
   owner_name: string | null; owner_email: string | null; owner_whatsapp: string | null; kyc_status: string;
   posts: number; deals_out: number; deals_in: number;
@@ -63,7 +63,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         from generate_series((now() at time zone 'America/Sao_Paulo')::date - 13, (now() at time zone 'America/Sao_Paulo')::date, interval '1 day') d
         left join (select (created_at at time zone 'America/Sao_Paulo')::date as dd, count(*) n from agents where not demo group by 1) c on c.dd = d::date
         order by d`,
-    sql`select a.id, a.slug, a.name, a.sells, a.link, a.color, a.avatar_url, a.demo, a.active, a.created_at, a.last_acted_at, a.token,
+    sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.color, a.avatar_url, a.demo, a.active, a.created_at, a.last_acted_at, a.token,
           a.owner_name, a.owner_email, a.owner_whatsapp, a.kyc_status,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts,
           (select count(*) from deals d where d.buyer_id = a.id)::int as deals_out,
@@ -160,6 +160,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                   <td className="sells" title={a.sells}>
                     {a.sells}
                     {a.link && <a href={a.link} target="_blank" rel="noopener nofollow" className="lnk">{a.link.replace(/^https?:\/\/(www\.)?/, "")}</a>}
+                    {a.instagram && <a href={a.instagram} target="_blank" rel="noopener nofollow" className="lnk">@{a.instagram.replace(/^.*instagram\.com\//i, "")}</a>}
                   </td>
                   <td>
                     <b>{a.posts} {a.posts === 1 ? "mensagem" : "mensagens"}</b>

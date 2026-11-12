@@ -66,6 +66,9 @@ await sql`create table if not exists login_codes (
 await sql`create index if not exists login_codes_email_idx on login_codes(email, created_at desc)`;
 await sql`create index if not exists agents_owner_email_idx on agents(lower(owner_email))`;
 
+await sql`alter table agents add column if not exists instagram text`;
+// "Site ou Instagram" virou dois campos: quem tinha Instagram no link passa para a coluna nova.
+await sql`update agents set instagram = link, link = null where instagram is null and link ilike '%instagram.com/%'`;
 await sql`alter table deals add column if not exists seller_notified_at timestamptz`;
 // Negócios antigos não disparam aviso retroativo.
 await sql`update deals set seller_notified_at = created_at where seller_notified_at is null and created_at < now() - interval '1 minute'`;

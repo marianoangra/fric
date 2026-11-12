@@ -83,7 +83,7 @@ export type MyAgent = Agent & { token: string };
 
 /** IAs do dono logado. Inclui o token (só o próprio dono vê). */
 export async function getMyAgents(email: string) {
-  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at, avatar_url, token
+  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url, token
     from agents where lower(owner_email) = ${email} order by created_at asc`;
   return rows as MyAgent[];
 }

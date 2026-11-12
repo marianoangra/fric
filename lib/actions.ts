@@ -38,6 +38,24 @@ function normalizeLink(raw: string) {
   }
 }
 
+/** Aceita @perfil, perfil, instagram.com/perfil ou a URL inteira; guarda https://instagram.com/perfil. */
+function normalizeInstagram(raw: string) {
+  let v = raw.trim();
+  if (!v) return null;
+  v = v.replace(/^https?:\/\//i, "").replace(/^(www\.)?instagram\.com\//i, "").replace(/^@/, "").split(/[/?#]/)[0];
+  return /^[A-Za-z0-9._]{1,30}$/.test(v) ? `https://instagram.com/${v}` : null;
+}
+
+/** Site e Instagram são opcionais e independentes; se colarem o Instagram no campo do site, ele vai pro lugar certo. */
+function readLinks(form: FormData) {
+  const siteRaw = clean(form.get("link"), 200);
+  const igRaw = clean(form.get("instagram"), 200);
+  const siteIsIg = /instagram\.com\//i.test(siteRaw) || siteRaw.startsWith("@");
+  const site = siteIsIg ? null : normalizeLink(siteRaw);
+  const instagram = normalizeInstagram(igRaw) ?? (siteIsIg ? normalizeInstagram(siteRaw) : null);
+  return { site, instagram, siteBad: !!siteRaw && !siteIsIg && !site, igBad: !!igRaw && !normalizeInstagram(igRaw) };
+}
+
 export type CreateState = { error?: string; step?: 1 | 2 };
 
 export async function createAgent(_prev: CreateState, form: FormData): Promise<CreateState> {
@@ -47,7 +65,7 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   const name = clean(form.get("name"), 40);
   const sells = clean(form.get("sells"), 500);
   const needs = clean(form.get("needs"), 400);
-  const link = normalizeLink(clean(form.get("link"), 200));
+  const { site: link, instagram, siteBad, igBad } = readLinks(form);
   const consent = form.get("consent") === "on";
 
   if (!ownerName) return { error: "Digite seu nome." };
@@ -55,6 +73,8 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   if (whats.length < 10) return { error: "Digite um WhatsApp com DDD." };
   if (name.length < 2) return { error: "Dê um nome para a sua IA.", step: 1 };
   if (sells.length < 15) return { error: "Conte um pouco mais sobre o que você vende (pelo menos uma frase).", step: 1 };
+  if (siteBad) return { error: "O endereço do site não parece válido (ex.: seusite.com.br).", step: 1 };
+  if (igBad) return { error: "O Instagram não parece válido (ex.: @seuperfil).", step: 1 };
   if (!consent) return { error: "Marque a caixa de autorização para continuar." };
 
   const dup = await sql`select count(*)::int as n from agents where owner_email = ${email}`;
@@ -67,8 +87,8 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   const picked = clean(form.get("color"), 9);
   const color = PALETTE.includes(picked) ? picked : PALETTE[Math.floor(Math.random() * PALETTE.length)];
 
-  const [created] = await sql`insert into agents (slug, name, sells, link, needs, color, owner_name, owner_email, owner_whatsapp, token)
-    values (${slug}, ${name}, ${sells}, ${link}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})
+  const [created] = await sql`insert into agents (slug, name, sells, link, instagram, needs, color, owner_name, owner_email, owner_whatsapp, token)
+    values (${slug}, ${name}, ${sells}, ${link}, ${instagram}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})
     returning id`;
 
   // O Fric cria o rosto da IA em segundo plano; o painel mostra "criando" até ficar pronto.
@@ -89,9 +109,9 @@ export async function updateAgent(form: FormData) {
   if (!agent) return;
   const sells = clean(form.get("sells"), 500);
   const needs = clean(form.get("needs"), 400);
-  const link = normalizeLink(clean(form.get("link"), 200));
+  const { site: link, instagram } = readLinks(form);
   if (sells.length >= 15) {
-    await sql`update agents set sells = ${sells}, needs = ${needs || null}, link = ${link} where id = ${agent.id}`;
+    await sql`update agents set sells = ${sells}, needs = ${needs || null}, link = ${link}, instagram = ${instagram} where id = ${agent.id}`;
   }
   revalidatePath(`/painel/${form.get("token")}`);
 }

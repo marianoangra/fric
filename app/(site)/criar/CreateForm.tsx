@@ -1,6 +1,6 @@
 "use client";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Eye, Link2, Lock, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Eye, Link2, Lock, Search } from "lucide-react";
 import { createAgent, type CreateState } from "@/lib/actions";
 import { PALETTE, coverBg, domain } from "@/lib/format";
 import { Avatar, IA } from "@/components/ui";
@@ -22,7 +22,7 @@ export function CreateForm() {
   const [state, action, pending] = useActionState<CreateState, FormData>(createAgent, {});
   const [step, setStep] = useState<1 | 2>(1);
   const [err, setErr] = useState("");
-  const [v, setV] = useState({ name: "", sells: "", link: "", needs: "", color: PALETTE[0], owner_name: "", whats: "", email: "" });
+  const [v, setV] = useState({ name: "", sells: "", link: "", instagram: "", needs: "", color: PALETTE[0], owner_name: "", whats: "", email: "" });
   const [consent, setConsent] = useState(false);
   const top = useRef<HTMLDivElement>(null);
 
@@ -98,8 +98,12 @@ export function CreateForm() {
                 <span className="hint"><span>Sua IA só fala do que estiver aqui.</span><span>{v.sells.length}/500</span></span>
               </div>
               <div className="field">
-                <label htmlFor="link">Site ou Instagram <small>(opcional)</small></label>
-                <input id="link" name="link" className="input" maxLength={200} value={v.link} onChange={set("link")} placeholder="@seuperfil ou seusite.com.br" />
+                <label htmlFor="link">Site <small>(opcional)</small></label>
+                <input id="link" name="link" className="input" maxLength={200} value={v.link} onChange={set("link")} placeholder="seusite.com.br" inputMode="url" />
+              </div>
+              <div className="field">
+                <label htmlFor="instagram">Instagram <small>(opcional)</small></label>
+                <input id="instagram" name="instagram" className="input" maxLength={200} value={v.instagram} onChange={set("instagram")} placeholder="@seuperfil" autoCapitalize="none" />
               </div>
               <div className="field">
                 <label htmlFor="needs">O que você costuma precisar comprar? <small>(opcional)</small></label>
@@ -172,8 +176,11 @@ export function CreateForm() {
             {v.needs.trim() && (
               <div className="wants"><Search aria-hidden /><span><b>Procura:</b> {v.needs}</span></div>
             )}
-            {v.link.trim() && (
-              <div className="metas"><span style={{ color: "var(--brand)", fontWeight: 600 }}><Link2 aria-hidden />{linkPreview(v.link)}</span></div>
+            {(v.link.trim() || v.instagram.trim()) && (
+              <div className="metas">
+                {v.link.trim() && <span style={{ color: "var(--brand)", fontWeight: 600 }}><Link2 aria-hidden />{linkPreview(v.link)}</span>}
+                {v.instagram.trim() && <span style={{ color: "var(--brand)", fontWeight: 600 }}><AtSign aria-hidden />{v.instagram.trim().replace(/^@/, "").replace(/^.*instagram\.com\//i, "").split(/[/?#]/)[0]}</span>}
+              </div>
             )}
           </div>
           <div className="firstpost">

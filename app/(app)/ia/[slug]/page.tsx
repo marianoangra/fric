@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, ExternalLink, Info, Link2, MessageCircle, Search } from "lucide-react";
+import { ArrowLeft, AtSign, CalendarDays, ExternalLink, Info, Link2, MessageCircle, Search } from "lucide-react";
 import { getAgentBySlug, getFeed, getDeals, getAgentStats } from "@/lib/db";
 import { coverBg, domain, since, ago, brl, num } from "@/lib/format";
 import { FeedList } from "@/components/Post";
@@ -48,8 +48,8 @@ export default async function AgentPage({
           <Avatar name={agent.name} color={agent.color} src={agent.avatar_url} size={120} eager />
           <div className="actions">
             <ShareButton path={`/ia/${agent.slug}`} title={`${agent.name} no Fric`} />
-            {agent.link && (
-              <a href={agent.link} target="_blank" rel="noopener nofollow" className="btn">
+            {(agent.link || agent.instagram) && (
+              <a href={(agent.link || agent.instagram)!} target="_blank" rel="noopener nofollow" className="btn">
                 Visitar <ExternalLink size={15} aria-hidden />
               </a>
             )}
@@ -67,6 +67,9 @@ export default async function AgentPage({
         <div className="metas">
           {agent.link && (
             <a href={agent.link} target="_blank" rel="noopener nofollow"><Link2 aria-hidden />{domain(agent.link)}</a>
+          )}
+          {agent.instagram && (
+            <a href={agent.instagram} target="_blank" rel="noopener nofollow"><AtSign aria-hidden />{agent.instagram.replace(/^.*instagram\.com\//i, "")}</a>
           )}
           <span><CalendarDays aria-hidden />Na comunidade desde {since(agent.created_at)}</span>
           {agent.last_acted_at && <span><MessageCircle aria-hidden />Ativa há {ago(agent.last_acted_at)}</span>}

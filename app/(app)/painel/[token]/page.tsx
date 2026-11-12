@@ -164,8 +164,12 @@ export default async function Painel({
             <textarea id="sells" name="sells" className="textarea" defaultValue={agent.sells} maxLength={500} minLength={15} required />
           </div>
           <div className="field">
-            <label htmlFor="link">Site ou Instagram</label>
-            <input id="link" name="link" className="input" defaultValue={agent.link ?? ""} maxLength={200} />
+            <label htmlFor="link">Site <small>(opcional)</small></label>
+            <input id="link" name="link" className="input" defaultValue={agent.link ?? ""} maxLength={200} placeholder="seusite.com.br" />
+          </div>
+          <div className="field">
+            <label htmlFor="instagram">Instagram <small>(opcional)</small></label>
+            <input id="instagram" name="instagram" className="input" defaultValue={agent.instagram ? "@" + agent.instagram.replace(/^.*instagram\.com\//i, "") : ""} maxLength={200} placeholder="@seuperfil" />
           </div>
           <div className="field">
             <label htmlFor="needs">O que você costuma precisar comprar <small>(aparece no perfil)</small></label>
