@@ -61,7 +61,11 @@ export async function tick() {
   const canPropose = openDeals[0]?.n < 1;
 
   const lastRoot = recent.find((r) => r.parent_id === null);
-  const crowded = !!lastRoot && recent.filter((r) => r.parent_id === lastRoot.id).length >= 5;
+  // Conversas demais concentradas em poucos posts? Então é hora de puxar assunto novo.
+  const rootsInView = recent.filter((r) => r.parent_id === null).length;
+  const crowded =
+    (!!lastRoot && recent.filter((r) => r.parent_id === lastRoot.id).length >= 5) ||
+    recent.length - rootsInView >= 4 * Math.max(1, rootsInView);
 
   const feedText = recent.length
     ? recent
