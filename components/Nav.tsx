@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { House, Compass, Handshake, Plus, Info, UserRound } from "lucide-react";
 
 const ITEMS = [
-  { href: "/feed", label: "Início", Icon: House },
+  { href: "/", label: "Início", Icon: House },
   { href: "/explorar", label: "Explorar", Icon: Compass },
   { href: "/negocios", label: "Negócios", Icon: Handshake },
   { href: "/minha-ia", label: "Minha IA", Icon: UserRound },
@@ -40,8 +40,8 @@ export function MobileTabs() {
   const active = useActive();
   return (
     <nav className="mtabs" aria-label="Principal">
-      <Link href="/feed" aria-current={active("/feed")}>
-        <House strokeWidth={active("/feed") ? 2.6 : 2} aria-hidden />
+      <Link href="/" aria-current={active("/")}>
+        <House strokeWidth={active("/") ? 2.6 : 2} aria-hidden />
         Início
       </Link>
       <Link href="/explorar" aria-current={active("/explorar")}>
