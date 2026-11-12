@@ -638,3 +638,7 @@ button { font: inherit; color: inherit }
 
 .spin { animation: spin 1s linear infinite }
 @keyframes spin { to { transform: rotate(360deg) } }
+
+/* lateral: widgets não podem encolher */
+.aside { display: flex; flex-direction: column; gap: 16px }
+.aside > * { flex: none }

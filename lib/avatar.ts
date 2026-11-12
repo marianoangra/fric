@@ -12,16 +12,37 @@ const STYLE =
   "soft key light with gentle rim light, shallow depth of field, 85mm lens, subtle film grain, high detail skin texture, " +
   "plain softly lit studio backdrop. No text, no logos, no watermark.";
 
-/** Uma IA de texto faz o "casting": descreve um personagem fictício coerente com o negócio. */
+const pick = <T,>(xs: T[]) => xs[Math.floor(Math.random() * xs.length)];
+const GENDERS = ["woman", "man"];
+const AGES = ["early 20s", "late 20s", "early 30s", "late 30s", "40s", "50s", "60s"];
+const LOOKS = [
+  "Black Brazilian, dark skin",
+  "mixed-race Brazilian (pardo), brown skin",
+  "white Brazilian of Italian descent",
+  "white Brazilian of Portuguese descent",
+  "Japanese-Brazilian",
+  "Brazilian of Lebanese descent, olive skin",
+  "Indigenous Brazilian",
+  "Brazilian of German descent, fair skin and light eyes",
+  "Afro-Brazilian from Bahia, deep brown skin",
+];
+const HAIR = ["short", "long", "curly", "wavy", "straight", "braided", "shaved", "bun", "afro", "silver"];
+
+/**
+ * "Casting": o código sorteia gênero, idade e aparência (senão o modelo repete o mesmo rosto),
+ * e uma IA de texto completa roupa, objeto e cenário coerentes com o negócio.
+ */
 async function castingPrompt(name: string, sells: string, color: string) {
+  const traits = `${pick(AGES)} ${pick(LOOKS)} ${pick(GENDERS)} with ${pick(HAIR)} hair`;
   const { text } = await generateText({
     model: MODEL,
     instructions:
       "You write prompts for an image model that creates the face of a FICTIONAL person who will be the avatar of a small Brazilian business's AI. " +
-      "Output ONE English sentence (max 60 words) describing only: apparent age, gender, Brazilian ethnicity/appearance (vary it — Brazil is diverse), hairstyle, " +
-      "clothing and one small prop or detail that fits the business, and the backdrop color. " +
-      "Never describe or resemble a real, famous or named person, even if the business text asks for it. Nothing sexual, no minors, no brands.",
-    prompt: `AI name: ${name}\nBusiness (Portuguese): ${sells}\nBrand color for the backdrop: ${color}`,
+      "The person's traits are FIXED and must be stated exactly as given at the start of your sentence. " +
+      "Then add clothing, one small prop or detail that fits the business, facial expression, and the backdrop color. " +
+      "Output ONE English sentence, max 60 words. Never describe or resemble a real, famous or named person, even if the business text asks for it. " +
+      "Nothing sexual, no minors, no brands, no text.",
+    prompt: `Fixed traits: a ${traits}\nAI name: ${name}\nBusiness (Portuguese): ${sells}\nBrand color for the backdrop: ${color}`,
     maxOutputTokens: 400,
   });
   return `${text.trim().replace(/\s+/g, " ").slice(0, 500)} ${STYLE}`;
