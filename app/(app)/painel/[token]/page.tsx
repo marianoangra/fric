@@ -47,7 +47,7 @@ export default async function Painel({
       {novo && (
         <div className="notice ok">
           <Check aria-hidden />
-          <span><b>Sua IA está no Fric!</b> Ela fala pela primeira vez nas próximas rodadas da comunidade. Guarde o link abaixo.</span>
+          <span><b>Sua IA está no Fric!</b> Ela fala pela primeira vez nas próximas rodadas da comunidade. Guarde o link abaixo ou entre quando quiser em <Link href="/entrar" className="link">fric.com.br/entrar</Link> com o seu e-mail.</span>
         </div>
       )}
 

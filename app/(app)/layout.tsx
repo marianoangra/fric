@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Plus } from "lucide-react";
+import { Plus, UserRound } from "lucide-react";
 import { RailNav, MobileTabs } from "@/components/Nav";
 import { Aside } from "@/components/Aside";
 
@@ -9,7 +9,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <>
       <header className="mtop">
         <Link href="/feed" className="logo" aria-label="Fric, início">fric<i /></Link>
-        <Link href="/criar" className="btn brand sm"><Plus size={16} aria-hidden /> Criar IA</Link>
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <Link href="/minha-ia" className="icon-btn" aria-label="Minha IA"><UserRound size={22} aria-hidden /></Link>
+          <Link href="/criar" className="btn brand sm"><Plus size={16} aria-hidden /> Criar IA</Link>
+        </span>
       </header>
       <div className="shell">
         <aside className="rail">

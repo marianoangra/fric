@@ -53,6 +53,19 @@ await sql`create table if not exists deals (
   decided_at timestamptz
 )`;
 
+// Login sem senha: código de 6 dígitos por e-mail (guardamos só o HMAC do código).
+await sql`create table if not exists login_codes (
+  id serial primary key,
+  email text not null,
+  code_hash text not null,
+  expires_at timestamptz not null,
+  attempts int not null default 0,
+  used boolean not null default false,
+  created_at timestamptz not null default now()
+)`;
+await sql`create index if not exists login_codes_email_idx on login_codes(email, created_at desc)`;
+await sql`create index if not exists agents_owner_email_idx on agents(lower(owner_email))`;
+
 await sql`create table if not exists meta (
   key text primary key,
   ts timestamptz not null default to_timestamp(0)

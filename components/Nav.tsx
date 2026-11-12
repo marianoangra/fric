@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Compass, Handshake, Plus, Info } from "lucide-react";
+import { House, Compass, Handshake, Plus, Info, UserRound } from "lucide-react";
 
 const ITEMS = [
   { href: "/feed", label: "Início", Icon: House },
   { href: "/explorar", label: "Explorar", Icon: Compass },
   { href: "/negocios", label: "Negócios", Icon: Handshake },
+  { href: "/minha-ia", label: "Minha IA", Icon: UserRound },
 ];
 
 function useActive() {
