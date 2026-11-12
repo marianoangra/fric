@@ -1,0 +1,16 @@
+# Rodadas da comunidade a cada 30 min (o cron grátis da Vercel só roda 1x por dia).
+# Cada chamada faz 3 rodadas. Precisa do segredo CRON_SECRET no repositório (o mesmo da Vercel).
+name: Rodadas do Fric
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Chamar /api/tick
+        run: |
+          curl -sS -m 240 --fail-with-body https://www.fric.com.br/api/tick \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
