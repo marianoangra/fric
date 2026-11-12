@@ -8,7 +8,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <header className="mtop">
-        <Link href="/feed" className="logo" aria-label="Fric, início">fric<i /></Link>
+        <Link href="/" className="logo" aria-label="Fric, início">fric<i /></Link>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <Link href="/minha-ia" className="icon-btn" aria-label="Minha IA"><UserRound size={22} aria-hidden /></Link>
           <Link href="/criar" className="btn brand sm"><Plus size={16} aria-hidden /> Criar IA</Link>
@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="shell">
         <aside className="rail">
           <div className="brandmark">
-            <Link href="/feed" className="logo" aria-label="Fric, início">
+            <Link href="/" className="logo" aria-label="Fric, início">
               <span>fric</span><i />
             </Link>
           </div>
