@@ -1,0 +1,118 @@
+:root {
+  --bg: #f3f5fb; --ink: #14172b; --muted: #4b5070; --line: #d5daee; --card: #ffffff;
+  --cobalt: #2f3cff; --cobalt-h: #1f2bd6; --mint: #3ddbb0; --sun: #ffc857;
+  --ok: #0b7a5c; --err: #b3261e;
+  --display: var(--font-display), "Trebuchet MS", system-ui, sans-serif;
+  --body: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.6 var(--body) }
+a { color: var(--cobalt) }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px }
+.narrow { max-width: 680px }
+
+/* topo */
+.top { padding: 20px 0; border-bottom: 1.5px solid var(--line); background: var(--bg); position: sticky; top: 0; z-index: 5 }
+.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px }
+.logo { font: 800 28px/1 var(--display); letter-spacing: -.02em; text-decoration: none; color: var(--ink) }
+.logo i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--mint); margin-left: 3px }
+.nav { display: flex; gap: 18px; align-items: center; font-weight: 700; font-size: 15px }
+.nav a { color: var(--ink); text-decoration: none }
+.nav a:hover { color: var(--cobalt) }
+
+/* botões e formulários */
+.btn { display: inline-flex; align-items: center; justify-content: center; font: 700 16px/1 var(--body); padding: 15px 24px; min-height: 50px; border-radius: 12px; border: 0; cursor: pointer; background: var(--cobalt); color: #fff; text-decoration: none }
+.btn:hover { background: var(--cobalt-h) }
+.btn.small { padding: 10px 16px; min-height: 40px; font-size: 14px; border-radius: 10px }
+.btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--ink) }
+.btn.ghost:hover { background: var(--ink); color: #fff }
+.btn.ok { background: var(--ok) }
+.btn.no { background: transparent; color: var(--err); border: 2px solid var(--line) }
+.btn:disabled { opacity: .6; cursor: wait }
+label { display: block; font-weight: 700; font-size: 14px; margin: 16px 0 6px }
+label small { font-weight: 400; color: var(--muted) }
+input, select, textarea { width: 100%; font: 400 16px var(--body); color: var(--ink); padding: 12px 14px; min-height: 50px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff }
+textarea { min-height: 84px; resize: vertical }
+.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 14px; margin-top: 18px }
+.check input { width: auto; min-height: 0; margin-top: 4px }
+.msg-err { color: var(--err); font-weight: 600; margin: 14px 0 0 }
+.msg-ok { color: var(--ok); font-weight: 600 }
+
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 20px; padding: 28px }
+.card h2 { font: 700 24px/1.2 var(--display); margin: 0 0 6px }
+.sub { margin: 0 0 8px; color: var(--muted); font-size: 15px }
+
+/* landing */
+h1 { font: 800 clamp(38px, 6vw, 64px)/1.02 var(--display); letter-spacing: -.03em; margin: 0 0 20px }
+.lead { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 28px }
+.hero { padding: 48px 0 72px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap }
+section.block { padding: 64px 0; border-top: 1.5px solid var(--line) }
+h2.t { font: 800 clamp(28px, 4vw, 40px)/1.1 var(--display); letter-spacing: -.02em; margin: 0 0 28px; max-width: 18em }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; list-style: none; padding: 0; margin: 0; counter-reset: s }
+.steps li { counter-increment: s; background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 24px }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--sun); font: 800 18px var(--display); margin-bottom: 14px }
+.steps h3, .rules h3 { font: 700 20px/1.2 var(--display); margin: 0 0 8px }
+.steps p, .rules p { margin: 0; color: var(--muted); font-size: 16px }
+.story { background: var(--ink); color: #fff; border-radius: 24px; padding: 36px }
+.story h2.t { color: #fff }
+.story ol { margin: 0; padding-left: 22px; display: grid; gap: 12px; font-size: 18px }
+.story ol b { color: var(--mint) }
+.story .note { margin: 24px 0 0; color: #b9bdd6; font-size: 15px }
+.rules { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px }
+.rules div { padding-left: 18px; border-left: 4px solid var(--mint) }
+.roadmap { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px }
+.roadmap li { display: flex; gap: 12px; align-items: baseline; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px 18px }
+.roadmap .st { font: 700 12px/1 var(--body); padding: 5px 8px; border-radius: 6px; white-space: nowrap; background: var(--line) }
+.roadmap .st.on { background: var(--mint) }
+footer { padding: 36px 0 48px; border-top: 1.5px solid var(--line); color: var(--muted); font-size: 14px }
+
+/* feed */
+.feed { display: grid; gap: 16px }
+.post { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 18px 20px }
+.ph { display: flex; gap: 12px; align-items: center; margin-bottom: 8px }
+.ph a { color: var(--ink); text-decoration: none }
+.ph a:hover { text-decoration: underline }
+.ph small { display: block; color: var(--muted); font-size: 13px }
+.av { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font: 800 18px var(--display); color: var(--ink); flex: none }
+.av.s { width: 30px; height: 30px; font-size: 14px }
+.av.l { width: 72px; height: 72px; font-size: 30px }
+.badge { display: inline-block; font: 700 11px/1 var(--body); background: var(--ink); color: #fff; border-radius: 5px; padding: 3px 6px; margin-left: 6px; vertical-align: 2px }
+.badge.demo { background: var(--line); color: var(--muted) }
+.post p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere }
+.thread { margin: 14px 0 0; padding: 12px 0 0 14px; border-left: 3px solid var(--line); display: grid; gap: 12px }
+.cm { display: flex; gap: 10px; font-size: 15px }
+.cm strong a { color: var(--ink); text-decoration: none }
+.cm p { margin: 2px 0 0 }
+.empty { text-align: center; color: var(--muted); padding: 40px 0 }
+.live { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); font-weight: 600 }
+.live::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px #3ddbb033 }
+.deal { border: 2px dashed var(--sun); background: #fff8e6; border-radius: 14px; padding: 14px 16px; margin-top: 12px; font-size: 15px }
+.deal b { font-family: var(--display) }
+.pill { display: inline-block; font: 700 12px/1 var(--body); padding: 5px 9px; border-radius: 999px; background: var(--line) }
+.pill.proposta { background: var(--sun) }
+.pill.aprovada { background: var(--mint) }
+.pill.recusada { background: #f3c9c6 }
+
+/* perfil e painel */
+.profile { display: flex; gap: 18px; align-items: center; margin: 32px 0 20px }
+.profile h1 { font-size: clamp(30px, 5vw, 44px); margin: 0 }
+.facts { display: grid; gap: 10px; margin: 0 0 28px }
+.facts div { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px 18px }
+.facts dt { font-weight: 700; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em }
+.facts dd { margin: 4px 0 0 }
+.secret { background: #fff8e6; border: 2px solid var(--sun); border-radius: 14px; padding: 16px 18px; margin: 20px 0; font-size: 15px }
+.secret code { display: block; margin-top: 8px; padding: 10px; background: #fff; border-radius: 8px; overflow-wrap: anywhere; font-size: 14px }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px }
+h2.s { font: 800 26px/1.2 var(--display); margin: 40px 0 14px }
+
+@media (max-width: 820px) {
+  .wrap { padding: 0 16px }
+  .hero, .rules, .steps { grid-template-columns: 1fr }
+  .hero { gap: 36px; padding-top: 28px }
+  .card { padding: 22px 18px }
+  .story { padding: 26px 20px }
+  .nav .hide-m { display: none }
+}
