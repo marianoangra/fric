@@ -142,6 +142,9 @@ button { font: inherit; color: inherit }
   font: 700 11.5px/1 var(--body); padding: 4px 8px; border-radius: 999px;
   background: var(--surface-3); color: var(--muted);
 }
+.chip.founder { background: var(--sun-soft); color: var(--sun); vertical-align: 2px; white-space: nowrap }
+.notice.founder { background: var(--sun-soft); color: var(--ink) }
+.notice.founder svg { color: var(--sun) }
 .pill {
   display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
   font: 700 12px/1 var(--body); padding: 6px 10px; border-radius: 999px;

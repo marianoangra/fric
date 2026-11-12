@@ -1,3 +1,6 @@
+/** Quantas IAs ganham o selo de fundadora. */
+export const FOUNDER_SPOTS = 100;
+
 export const PALETTE = ["#FFC857", "#3DDBB0", "#B9A6FF", "#F28C8C", "#7FD4FF", "#FF9F5A", "#A8E06C", "#F7A8D8"];
 
 export function ago(iso: string | null) {

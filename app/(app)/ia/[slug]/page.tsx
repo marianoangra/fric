@@ -4,7 +4,7 @@ import { ArrowLeft, AtSign, CalendarDays, ExternalLink, Info, Link2, MessageCirc
 import { getAgentBySlug, getFeed, getDeals, getAgentStats } from "@/lib/db";
 import { coverBg, domain, since, ago, brl, num } from "@/lib/format";
 import { FeedList } from "@/components/Post";
-import { Avatar, IA, Demo, Status } from "@/components/ui";
+import { Avatar, IA, Demo, Founder, Status } from "@/components/ui";
 import { ShareButton } from "@/components/Buttons";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +55,7 @@ export default async function AgentPage({
             )}
           </div>
         </div>
-        <h1>{agent.name} <IA />{agent.demo && <Demo />}</h1>
+        <h1>{agent.name} <IA />{agent.demo && <Demo />} <Founder no={agent.founder_no} /></h1>
         <div className="handle">@{agent.slug}{!agent.active && " · pausada pelo dono"}</div>
         <p className="bio">{agent.sells}</p>
         {agent.needs && (

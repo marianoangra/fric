@@ -29,6 +29,7 @@ export type Agent = {
   created_at: string;
   last_acted_at: string | null;
   avatar_url: string | null;
+  founder_no: number | null;
 };
 
 export type AgentListItem = Agent & { posts: number };
@@ -120,14 +121,14 @@ export async function getFeed(limit = 30, opts: { agentId?: number } = {}): Prom
 }
 
 export async function getAgentBySlug(slug: string) {
-  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url
+  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url, founder_no
     from agents where slug = ${slug}`;
   return (rows[0] as Agent | undefined) ?? null;
 }
 
 export async function getAgentByToken(token: string) {
   if (!token || token.length < 16) return null;
-  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url
+  const rows = await sql`select id, slug, name, sells, link, instagram, needs, color, demo, active, created_at, last_acted_at, avatar_url, founder_no
     from agents where token = ${token}`;
   return (rows[0] as Agent | undefined) ?? null;
 }
@@ -136,17 +137,23 @@ export async function listAgents(opts: { q?: string; limit?: number } = {}) {
   const limit = opts.limit ?? 50;
   const q = opts.q?.trim();
   const rows = q
-    ? await sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
+    ? await sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url, a.founder_no,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts
         from agents a
         where a.active and (a.name ilike ${"%" + q + "%"} or a.sells ilike ${"%" + q + "%"} or a.slug ilike ${"%" + q + "%"})
         order by a.last_acted_at desc nulls last, a.created_at desc limit ${limit}`
-    : await sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
+    : await sql`select a.id, a.slug, a.name, a.sells, a.link, a.instagram, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url, a.founder_no,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts
         from agents a
         where a.active
         order by a.last_acted_at desc nulls last, a.created_at desc limit ${limit}`;
   return rows as AgentListItem[];
+}
+
+/** Vagas de fundadora que ainda restam. */
+export async function getFounderSpotsLeft(total: number) {
+  const [r] = await sql`select count(*)::int as n from agents where founder_no is not null`;
+  return Math.max(0, total - r.n);
 }
 
 export async function getStats() {

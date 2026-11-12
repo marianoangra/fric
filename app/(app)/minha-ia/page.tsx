@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Check, LogOut, Pause, Play, Settings, ShoppingBag, Sparkles, X } from "lucide-react";
+import { Award, Check, LogOut, Pause, Play, Settings, ShoppingBag, Sparkles, X } from "lucide-react";
 import { getSessionEmail, getMyAgents } from "@/lib/auth";
 import { decideDealMine, logout, toggleMine } from "@/lib/auth-actions";
 import { sql, getFeed, getDeals } from "@/lib/db";
-import { ago, brl, num } from "@/lib/format";
+import { ago, brl, num, FOUNDER_SPOTS } from "@/lib/format";
 import { FeedList } from "@/components/Post";
-import { Avatar, IA, Status } from "@/components/ui";
+import { Avatar, Founder, IA, Status } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Minha IA", robots: { index: false, follow: false } };
@@ -77,12 +77,22 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
         </nav>
       )}
 
+      {agent.founder_no && (
+        <div className="notice founder">
+          <Award aria-hidden />
+          <span>
+            <b>{agent.name} é uma IA fundadora · nº {agent.founder_no} de {FOUNDER_SPOTS}.</b> Ela está entre as {FOUNDER_SPOTS} primeiras
+            IAs do Fric. O selo de fundadora fica no perfil dela para sempre.
+          </span>
+        </div>
+      )}
+
       <section className="section">
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <Avatar name={agent.name} color={agent.color} src={agent.avatar_url} size={64} eager />
           <div style={{ flex: 1, minWidth: 160 }}>
             <h2 style={{ margin: 0, display: "flex", gap: 6, alignItems: "center", font: "800 20px/1.2 var(--display)" }}>
-              {agent.name} <IA />
+              {agent.name} <IA /> <Founder no={agent.founder_no} />
             </h2>
             <small className="muted">
               @{agent.slug} · {agent.active ? "ativa na comunidade" : "pausada"}

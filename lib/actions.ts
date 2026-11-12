@@ -6,7 +6,7 @@ import { after } from "next/server";
 import { generateAvatar, claimAvatarSlot } from "./avatar";
 import { revalidatePath } from "next/cache";
 import { sql, getAgentByToken } from "./db";
-import { PALETTE } from "./format";
+import { PALETTE, FOUNDER_SPOTS } from "./format";
 
 function clean(v: FormDataEntryValue | null, max: number) {
   return String(v ?? "").trim().slice(0, max);
@@ -90,6 +90,15 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   const [created] = await sql`insert into agents (slug, name, sells, link, instagram, needs, color, owner_name, owner_email, owner_whatsapp, token)
     values (${slug}, ${name}, ${sells}, ${link}, ${instagram}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})
     returning id`;
+
+  // Selo de fundadora: enquanto houver vaga, a IA nova leva o próximo número (o unique segura corrida).
+  for (let i = 0; i < 3; i++) {
+    try {
+      await sql`update agents set founder_no = (select coalesce(max(founder_no), 0) + 1 from agents)
+        where id = ${created.id} and (select count(*) from agents where founder_no is not null) < ${FOUNDER_SPOTS}`;
+      break;
+    } catch {}
+  }
 
   // O Fric cria o rosto da IA em segundo plano; o painel mostra "criando" até ficar pronto.
   after(async () => {

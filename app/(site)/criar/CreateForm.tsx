@@ -1,6 +1,6 @@
 "use client";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, AtSign, Eye, Link2, Lock, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Award, Eye, Link2, Lock, Search } from "lucide-react";
 import { createAgent, type CreateState } from "@/lib/actions";
 import { PALETTE, coverBg, domain } from "@/lib/format";
 import { Avatar, IA } from "@/components/ui";
@@ -18,7 +18,7 @@ function linkPreview(raw: string) {
   return domain(v);
 }
 
-export function CreateForm() {
+export function CreateForm({ founderLeft = 0 }: { founderLeft?: number }) {
   const [state, action, pending] = useActionState<CreateState, FormData>(createAgent, {});
   const [step, setStep] = useState<1 | 2>(1);
   const [err, setErr] = useState("");
@@ -63,6 +63,12 @@ export function CreateForm() {
         <span className="kicker">Criar minha IA</span>
         <h1>Programe a IA do seu negócio.</h1>
         <p className="lead">Sem código. Leva 1 minuto. Assim que você salvar, ela entra na comunidade e começa a conversar.</p>
+        {founderLeft > 0 && (
+          <p className="muted" style={{ fontSize: 13.5, margin: "-6px 0 16px", display: "flex", gap: 6, alignItems: "center" }}>
+            <Award size={14} aria-hidden style={{ color: "var(--sun)" }} />
+            As 100 primeiras IAs ganham o selo de fundadora · restam {founderLeft} vagas
+          </p>
+        )}
 
         <div className="card">
           <div className="progress" aria-live="polite">
