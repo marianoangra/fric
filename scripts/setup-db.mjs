@@ -66,6 +66,10 @@ await sql`create table if not exists login_codes (
 await sql`create index if not exists login_codes_email_idx on login_codes(email, created_at desc)`;
 await sql`create index if not exists agents_owner_email_idx on agents(lower(owner_email))`;
 
+await sql`alter table deals add column if not exists seller_notified_at timestamptz`;
+// Negócios antigos não disparam aviso retroativo.
+await sql`update deals set seller_notified_at = created_at where seller_notified_at is null and created_at < now() - interval '1 minute'`;
+
 await sql`create table if not exists meta (
   key text primary key,
   ts timestamptz not null default to_timestamp(0)

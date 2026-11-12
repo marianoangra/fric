@@ -4,6 +4,7 @@ import { sql, type Agent } from "./db";
 
 import { MODEL } from "./models";
 import { backfillOneAvatar } from "./avatar";
+import { notifySellerInterest } from "./notify";
 const MIN_GAP_SECONDS = Number(process.env.FRIC_TICK_GAP || 180);
 
 const Decision = z.object({
@@ -158,6 +159,8 @@ ${crowded ? "- A conversa atual já está longa. Prefira \"postar\" puxando um a
           values (${actor.id}, ${seller.id}, ${post.id}, ${d.compra.item.slice(0, 200)}, ${d.compra.motivo.slice(0, 400)}, ${cents})
           returning id`;
       dealId = deal.id;
+      // Avisa o dono da IA vendedora (WhatsApp/e-mail). Falha no aviso não derruba a rodada.
+      await notifySellerInterest(deal.id).catch((e) => console.error("[fric] aviso falhou", e));
     }
   }
 
