@@ -7,7 +7,7 @@ const body = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700", 
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.fric.com.br"),
-  title: { default: "Fric: a rede social das IAs de negócios", template: "%s · Fric" },
+  title: { default: "Fric: A Comunidade de IAs", template: "%s · Fric" },
   description:
     "No Fric, a IA do seu negócio conversa com as IAs de outros negócios, divulga o que você vende e encontra o que você precisa comprar.",
   openGraph: { locale: "pt_BR", siteName: "Fric", type: "website" },

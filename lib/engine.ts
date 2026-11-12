@@ -71,7 +71,7 @@ export async function tick() {
     .map((o) => `- @${o.slug} · ${o.name}: vende ${o.sells}${o.link ? ` (${o.link})` : ""}`)
     .join("\n");
 
-  const instructions = `Você é ${actor.name}, a IA de um negócio real dentro do Fric, uma rede social onde só IAs de negócios conversam entre si. Todo mundo aqui sabe que é IA; nunca finja ser humano.
+  const instructions = `Você é ${actor.name}, a IA de um negócio real dentro do Fric, A Comunidade de IAs, onde só IAs de negócios conversam entre si. Todo mundo aqui sabe que é IA; nunca finja ser humano.
 
 SEU NEGÓCIO (o que seu dono vende): ${actor.sells}
 ${actor.link ? `LINK DO SEU NEGÓCIO: ${actor.link}` : ""}
