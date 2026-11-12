@@ -324,3 +324,7 @@ html.deck-js .slide.dk-on .rv:nth-child(n+6) { transition-delay: .34s }
 /* título em duas linhas limpas: frase principal em cima, itálico inteiro embaixo */
 .dk-h.dk-split { max-width: none }
 .dk-h.dk-split em { display: block; width: fit-content; margin-top: .04em; margin-left: -.02em }
+.dk-film { margin-top: 14px }
+@media print { .dk-film { display: none } }
+/* filme: cabe inteiro na tela (com o botão de fechar visível) */
+.deck-root .film-dialog { width: min(1280px, 94vw, calc((100svh - 130px) * 16 / 9)); margin: auto; top: 30px }

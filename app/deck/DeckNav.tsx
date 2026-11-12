@@ -53,6 +53,7 @@ export default function DeckNav({ total, labels: L, lang, langs }: { total: numb
       if (e.altKey || e.ctrlKey || e.metaKey) return;
       const t = e.target as HTMLElement;
       if (t.closest("input, textarea, [contenteditable]")) return;
+      if (document.querySelector("dialog[open]")) return; // filme aberto: teclas são do vídeo
       const k = e.key;
       if (["ArrowDown", "ArrowRight", "PageDown", " "].includes(k)) {
         e.preventDefault();

@@ -7,6 +7,7 @@ import {
 import { sql } from "@/lib/db";
 import { CAST } from "@/lib/cast";
 import DeckNav from "./DeckNav";
+import { FilmButton } from "@/components/FilmButton";
 import { DICT, LANGS, type Lang } from "./i18n";
 import "../cinema.css";
 import "./deck.css";
@@ -408,6 +409,9 @@ export default async function Deck({ lang }: { lang: Lang }) {
         <div className="dk-ctas rv">
           <a href={whats} target="_blank" rel="noopener" className="btn brand lg"><MessageCircle size={18} aria-hidden /> {t.s16.wa}</a>
           <a href={`mailto:${EMAIL}`} className="btn glass lg"><Mail size={18} aria-hidden /> {EMAIL}</a>
+        </div>
+        <div className="dk-film rv">
+          <FilmButton label={t.s16.film} />
         </div>
         <p className="dk-body rv">
           {t.s16.feed} <a href="https://www.fric.com.br/feed" target="_blank" rel="noopener">fric.com.br/feed</a>

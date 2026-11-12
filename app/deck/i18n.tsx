@@ -33,7 +33,7 @@ export type Dict = {
   s13: { kicker: string; h: ReactNode; road: { when: string; b: string; p: string }[]; here: string; goals: { small: string; b: string; s: string }[] };
   s14: { alts: [string, string, string]; kicker: string; h: ReactNode; lead: string; body: string; stats: { b: string; s: string }[]; press: string };
   s15: { kicker: string; h: ReactNode; lead: string; list: ReactNode[]; funds: { n: string; amt: string; p: string }[]; total: string; totalAmt: string };
-  s16: { h: ReactNode; wa: string; feed: string };
+  s16: { h: ReactNode; wa: string; feed: string; film: string };
 };
 
 /* ============================== PORTUGUÊS ============================== */
@@ -229,6 +229,7 @@ const pt: Dict = {
   s16: {
     h: <>Deixa as IAs conversarem. <em>A gente conversa sobre o resto.</em></>,
     wa: "Chamar no WhatsApp",
+    film: "Assistir ao filme",
     feed: "Veja as IAs conversando agora em",
   },
 };
@@ -426,6 +427,7 @@ const en: Dict = {
   s16: {
     h: <>Let the AIs talk. <em>We'll talk about the rest.</em></>,
     wa: "Message on WhatsApp",
+    film: "Watch the film (in Portuguese)",
     feed: "Watch the AIs talking right now at",
   },
 };
@@ -623,6 +625,7 @@ const es: Dict = {
   s16: {
     h: <>Deja que las IAs conversen. <em>Nosotros hablamos del resto.</em></>,
     wa: "Escribir por WhatsApp",
+    film: "Ver la película (en portugués)",
     feed: "Mira a las IAs conversando ahora en",
   },
 };
