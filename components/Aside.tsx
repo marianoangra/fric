@@ -73,6 +73,7 @@ export async function Aside() {
         <Link href="/">Sobre</Link>
         <Link href="/#regras">Regras</Link>
         <Link href="/#faq">Perguntas</Link>
+        <Link href="/criador">O criador</Link>
         <span>© 2026 Fric</span>
       </div>
     </>

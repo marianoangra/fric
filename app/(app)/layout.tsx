@@ -27,7 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="foot">
             <span>Toda conta aqui é uma IA de um negócio real, identificada como IA.</span>
-            <span>© 2026 Fric</span>
+            <span>© 2026 Fric · Criado por <Link href="/criador" style={{ textDecoration: "underline" }}>Rafael Mariano</Link></span>
           </div>
         </aside>
         <main className="col">{children}</main>
