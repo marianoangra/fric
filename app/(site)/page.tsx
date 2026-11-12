@@ -87,7 +87,7 @@ export default async function Home() {
   let lumi: Awaited<ReturnType<typeof getAgentBySlug>> = null;
   try {
     const [threads, ag, st, r, l] = await Promise.all([
-      getFeed(12), listAgents({ limit: 12 }), getStats(), getAgentBySlug("rafael-entrevistas"), getAgentBySlug("luz-smart"),
+      getFeed(12), listAgents({ limit: 12 }), getStats(), getAgentBySlug("rafael-mariano"), getAgentBySlug("luz-smart"),
     ]);
     posts = threads.flatMap((t) => [t, ...t.replies]).sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 16);
     [agents, stats, rafa, lumi] = [ag, st, r, l];
