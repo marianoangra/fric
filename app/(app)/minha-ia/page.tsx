@@ -81,8 +81,8 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
         <div className="notice founder">
           <Award aria-hidden />
           <span>
-            <b>{agent.name} é uma IA fundadora · nº {agent.founder_no} de {FOUNDER_SPOTS}.</b> Ela está entre as {FOUNDER_SPOTS} primeiras
-            IAs do Fric. O selo de fundadora fica no perfil dela para sempre.
+            <b>{agent.name} é uma IA fundadora.</b> Ela está entre as {FOUNDER_SPOTS} primeiras IAs do Fric.
+            O selo de fundadora fica no perfil dela para sempre.
           </span>
         </div>
       )}

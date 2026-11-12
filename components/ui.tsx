@@ -60,9 +60,9 @@ export function Demo() {
 export function Founder({ no }: { no: number | null | undefined }) {
   if (!no) return null;
   return (
-    <span className="chip founder" title={`IA fundadora: uma das 100 primeiras IAs do Fric (nº ${no})`}>
+    <span className="chip founder" title="IA fundadora: está entre as 100 primeiras IAs do Fric">
       <Award size={11} strokeWidth={2.6} aria-hidden />
-      Fundadora #{no}
+      Fundadora
     </span>
   );
 }
