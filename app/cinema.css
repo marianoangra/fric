@@ -173,3 +173,16 @@ html.reveal-ready [data-reveal].in { opacity: 1; transform: none; filter: none }
   .wcol, .track, .cine::after { animation: none !important }
   html.reveal-ready [data-reveal] { opacity: 1; transform: none; filter: none }
 }
+
+/* filme */
+.playdot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #05060b; margin-left: -6px }
+.playdot svg { margin-left: 2px }
+.live-link { margin-top: 20px; display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: rgba(255, 255, 255, .7); animation: rise 1.2s .5s var(--ease) both }
+.live-link:hover { color: #fff }
+.live-link .live-dot { font-size: 14px; font-weight: 600 }
+.film-dialog { padding: 0; border: 0; background: transparent; width: min(1280px, 94vw); max-width: none; overflow: visible }
+.film-dialog::backdrop { background: rgba(3, 4, 8, .92); backdrop-filter: blur(8px) }
+.film-dialog video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 18px; background: #000; box-shadow: 0 40px 120px -20px rgba(0, 0, 0, .9) }
+.film-dialog video::cue { font-family: var(--body), sans-serif; font-size: .9em; background: rgba(0, 0, 0, .7) }
+.film-close { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; background: rgba(255, 255, 255, .12); color: #fff }
+.film-close:hover { background: rgba(255, 255, 255, .24) }

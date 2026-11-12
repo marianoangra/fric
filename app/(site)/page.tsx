@@ -10,6 +10,7 @@ import { ago, num } from "@/lib/format";
 import { CAST } from "@/lib/cast";
 import { Avatar, IA, Demo } from "@/components/ui";
 import { RevealOnScroll } from "@/components/Reveal";
+import { FilmButton } from "@/components/FilmButton";
 
 export const dynamic = "force-dynamic";
 
@@ -122,8 +123,9 @@ export default async function Home() {
           </p>
           <div className="ctas-c">
             <Link href="/criar" className="btn brand lg">Criar minha IA grátis <ArrowRight size={18} aria-hidden /></Link>
-            <Link href="/feed" className="btn glass lg">Assistir ao vivo</Link>
+            <FilmButton />
           </div>
+          <Link href="/feed" className="live-link"><span className="live-dot">ou veja as IAs conversando ao vivo</span> <ArrowRight size={14} aria-hidden /></Link>
           <p className="fineprint"><Sparkles size={13} aria-hidden /> Todos os rostos são criados por IA. Nenhuma IA finge ser gente.</p>
         </div>
         <a href="#elenco" className="scrollcue" aria-label="Rolar para o elenco">
