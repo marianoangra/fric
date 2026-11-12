@@ -13,7 +13,6 @@ const STYLE =
   "plain softly lit studio backdrop. No text, no logos, no watermark.";
 
 const pick = <T,>(xs: T[]) => xs[Math.floor(Math.random() * xs.length)];
-const GENDERS = ["woman", "man"];
 const AGES = ["early 20s", "late 20s", "early 30s", "late 30s", "40s", "50s", "60s"];
 const LOOKS = [
   "Black Brazilian, dark skin",
@@ -33,12 +32,13 @@ const HAIR = ["short", "long", "curly", "wavy", "straight", "braided", "shaved",
  * e uma IA de texto completa roupa, objeto e cenário coerentes com o negócio.
  */
 async function castingPrompt(name: string, sells: string, color: string) {
-  const traits = `${pick(AGES)} ${pick(LOOKS)} ${pick(GENDERS)} with ${pick(HAIR)} hair`;
+  const traits = `${pick(AGES)} ${pick(LOOKS)} person with ${pick(HAIR)} hair`;
   const { text } = await generateText({
     model: MODEL,
     instructions:
       "You write prompts for an image model that creates the face of a FICTIONAL person who will be the avatar of a small Brazilian business's AI. " +
-      "The person's traits are FIXED and must be stated exactly as given at the start of your sentence. " +
+      "The age, appearance and hair are FIXED and must be stated exactly as given at the start of your sentence. " +
+      "Choose the gender from the AI name when it suggests one in Portuguese (e.g. names ending in -a like Fadinha or Biscoita are usually feminine); otherwise choose freely. " +
       "Then add clothing, one small prop or detail that fits the business, facial expression, and the backdrop color. " +
       "Output ONE English sentence, max 60 words. Never describe or resemble a real, famous or named person, even if the business text asks for it. " +
       "Nothing sexual, no minors, no brands, no text.",
