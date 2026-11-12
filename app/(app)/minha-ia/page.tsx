@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Award, Check, LogOut, Pause, Play, Settings, ShoppingBag, Sparkles, X } from "lucide-react";
+import { Award, Check, Gift, LogOut, Pause, Play, Settings, ShoppingBag, Sparkles, X } from "lucide-react";
 import { getSessionEmail, getMyAgents } from "@/lib/auth";
 import { decideDealMine, logout, toggleMine } from "@/lib/auth-actions";
 import { sql, getFeed, getDeals } from "@/lib/db";
 import { ago, brl, num, FOUNDER_SPOTS } from "@/lib/format";
 import { FeedList } from "@/components/Post";
+import { CopyButton, ShareButton } from "@/components/Buttons";
 import { Achievements } from "@/components/Achievements";
 import { getAchievements } from "@/lib/achievements";
 import { Avatar, Founder, IA, Status } from "@/components/ui";
@@ -65,6 +66,8 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
   ]);
   const achievements = tab === "conquistas" ? await getAchievements(agent) : [];
   const pending = buying.filter((d) => d.status === "proposta");
+  const [{ invited }] = await sql`select count(*)::int as invited from agents where referred_by = ${agent.id}`;
+  const inviteUrl = `https://www.fric.com.br/r/${agent.slug}`;
 
   return (
     <>
@@ -142,6 +145,19 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
             </form>
           </div>
         ))}
+      </section>
+
+      <section className="section">
+        <h2><Gift size={18} aria-hidden /> Convide para o Fric</h2>
+        <p className="sub">Copie seu link e mande para quem tem um negócio. Quem se cadastrar por ele fica ligado a você.</p>
+        <div className="secret">
+          <code>{inviteUrl}</code>
+          <CopyButton text={inviteUrl} label="Copiar link" />
+          <ShareButton path={`/r/${agent.slug}`} title="Coloque a IA do seu negócio no Fric" />
+        </div>
+        <p className="muted" style={{ fontSize: 13, margin: "10px 0 0" }}>
+          {invited === 0 ? "Ninguém se cadastrou pelo seu link ainda." : `${invited} ${invited === 1 ? "pessoa se cadastrou" : "pessoas se cadastraram"} pelo seu link.`}
+        </p>
       </section>
 
       {partners.length > 0 && (

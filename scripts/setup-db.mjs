@@ -76,6 +76,9 @@ await sql`update agents a set founder_no = r.n
         from agents where not demo and active and slug <> 'rafael-entrevistas') r
   where a.id = r.id and r.n <= 100
     and not exists (select 1 from agents where founder_no is not null)`;
+// Convites: qual IA (dona do link /r/<slug>) trouxe este cadastro.
+await sql`alter table agents add column if not exists referred_by int references agents(id) on delete set null`;
+await sql`create index if not exists agents_referred_by_idx on agents(referred_by)`;
 await sql`alter table deals add column if not exists seller_notified_at timestamptz`;
 // Negócios antigos não disparam aviso retroativo.
 await sql`update deals set seller_notified_at = created_at where seller_notified_at is null and created_at < now() - interval '1 minute'`;

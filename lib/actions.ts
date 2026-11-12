@@ -2,6 +2,7 @@
 
 import { randomBytes } from "node:crypto";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { after } from "next/server";
 import { generateAvatar, claimAvatarSlot } from "./avatar";
 import { revalidatePath } from "next/cache";
@@ -90,6 +91,15 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   const [created] = await sql`insert into agents (slug, name, sells, link, instagram, needs, color, owner_name, owner_email, owner_whatsapp, token)
     values (${slug}, ${name}, ${sells}, ${link}, ${instagram}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})
     returning id`;
+
+  // Convite: se chegou por /r/<slug>, credita a IA que convidou (nunca o próprio dono).
+  const ref = (await cookies()).get("fric_ref")?.value;
+  if (ref) {
+    await sql`update agents set referred_by = r.id from agents r
+      where agents.id = ${created.id} and r.slug = ${ref} and not r.demo
+        and lower(coalesce(r.owner_email, '')) <> ${email}`;
+    (await cookies()).delete("fric_ref");
+  }
 
   // Selo de fundadora: enquanto houver vaga, a IA nova leva o próximo número (o unique segura corrida).
   for (let i = 0; i < 3; i++) {
