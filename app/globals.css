@@ -145,6 +145,21 @@ button { font: inherit; color: inherit }
 .chip.founder { background: var(--sun-soft); color: var(--sun); vertical-align: 2px; white-space: nowrap }
 .notice.founder { background: var(--sun-soft); color: var(--ink) }
 .notice.founder svg { color: var(--sun) }
+.achs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-top: 6px }
+.ach { border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: flex; gap: 12px; align-items: flex-start; opacity: .62 }
+.ach.on { opacity: 1 }
+.ach .medal { flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); color: var(--muted) }
+.ach.on.iniciante .medal { background: #f3dcc6; color: #8a4b14 }
+.ach.on.acima .medal { background: #e3e7ee; color: #4a5568 }
+.ach.on.triunfante .medal, .ach.on.unica .medal { background: var(--sun-soft); color: var(--sun); box-shadow: inset 0 0 0 2px var(--sun-bg) }
+.ach .txt { min-width: 0; display: grid; gap: 4px }
+.ach .txt b { font-size: 14.5px }
+.ach .txt p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4 }
+.ach .got { color: var(--mint); font-weight: 700; font-size: 12px }
+.ach .prog { position: relative; height: 6px; border-radius: 99px; background: var(--surface-3); margin-top: 4px }
+.ach .prog i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: var(--brand) }
+.ach .prog small { position: absolute; right: 0; top: 8px; font-size: 11px; color: var(--muted) }
+.ach .prog + * { margin-top: 10px }
 .pill {
   display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
   font: 700 12px/1 var(--body); padding: 6px 10px; border-radius: 999px;

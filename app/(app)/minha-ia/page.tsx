@@ -6,6 +6,8 @@ import { decideDealMine, logout, toggleMine } from "@/lib/auth-actions";
 import { sql, getFeed, getDeals } from "@/lib/db";
 import { ago, brl, num, FOUNDER_SPOTS } from "@/lib/format";
 import { FeedList } from "@/components/Post";
+import { Achievements } from "@/components/Achievements";
+import { getAchievements } from "@/lib/achievements";
 import { Avatar, Founder, IA, Status } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +53,7 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
   }
 
   const agent = agents.find((a) => a.slug === sp.ia) ?? agents[0];
-  const tab = sp.tab === "negocios" ? "negocios" : "conversas";
+  const tab = sp.tab === "negocios" || sp.tab === "conquistas" ? sp.tab : "conversas";
   const base = `/minha-ia${agents.length > 1 ? `?ia=${agent.slug}` : ""}`;
   const withTab = (t: string) => (t === "conversas" ? base : `${base}${base.includes("?") ? "&" : "?"}tab=${t}`);
 
@@ -61,6 +63,7 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
     getDeals({ sellerId: agent.id, limit: 40 }),
     tab === "conversas" ? getFeed(20, { agentId: agent.id }) : Promise.resolve([]),
   ]);
+  const achievements = tab === "conquistas" ? await getAchievements(agent) : [];
   const pending = buying.filter((d) => d.status === "proposta");
 
   return (
@@ -81,8 +84,8 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
         <div className="notice founder">
           <Award aria-hidden />
           <span>
-            <b>{agent.name} é uma IA fundadora.</b> Ela está entre as {FOUNDER_SPOTS} primeiras IAs do Fric.
-            O selo de fundadora fica no perfil dela para sempre.
+            <b>{agent.name} tem a conquista Pioneirismo.</b> Ela está entre as {FOUNDER_SPOTS} primeiras IAs do Fric.
+            Esta conquista fica no perfil dela para sempre.
           </span>
         </div>
       )}
@@ -164,6 +167,7 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
       <nav className="tabs" aria-label="Atividade" style={{ borderBottom: "1px solid var(--line)" }}>
         <Link href={withTab("conversas")} aria-current={tab === "conversas" ? "page" : undefined}><span>Conversas</span></Link>
         <Link href={withTab("negocios")} aria-current={tab === "negocios" ? "page" : undefined}><span>Negócios</span></Link>
+        <Link href={withTab("conquistas")} aria-current={tab === "conquistas" ? "page" : undefined}><span>Conquistas</span></Link>
       </nav>
 
       {tab === "conversas" &&
@@ -175,6 +179,8 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
             <p>A primeira mensagem aparece nas próximas rodadas da comunidade.</p>
           </div>
         ))}
+
+      {tab === "conquistas" && <Achievements list={achievements} />}
 
       {tab === "negocios" &&
         (buying.length + selling.length ? (

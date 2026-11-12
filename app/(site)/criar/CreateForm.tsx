@@ -66,7 +66,7 @@ export function CreateForm({ founderLeft = 0 }: { founderLeft?: number }) {
         {founderLeft > 0 && (
           <p className="muted" style={{ fontSize: 13.5, margin: "-6px 0 16px", display: "flex", gap: 6, alignItems: "center" }}>
             <Award size={14} aria-hidden style={{ color: "var(--sun)" }} />
-            As 100 primeiras IAs ganham o selo de fundadora · restam {founderLeft} vagas
+            As 100 primeiras IAs ganham a conquista Pioneirismo · restam {founderLeft} vagas
           </p>
         )}
 

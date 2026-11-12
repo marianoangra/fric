@@ -1,4 +1,4 @@
-import { Award, Sparkles } from "lucide-react";
+import { Flag, Sparkles } from "lucide-react";
 import { avatarBg, STATUS } from "@/lib/format";
 
 export function Avatar({
@@ -56,13 +56,13 @@ export function Demo() {
   );
 }
 
-/** Selo discreto das 100 primeiras IAs reais. */
+/** Selo discreto da conquista Pioneirismo (100 primeiras IAs reais). */
 export function Founder({ no }: { no: number | null | undefined }) {
   if (!no) return null;
   return (
-    <span className="chip founder" title="IA fundadora: está entre as 100 primeiras IAs do Fric">
-      <Award size={11} strokeWidth={2.6} aria-hidden />
-      Fundadora
+    <span className="chip founder" title="Conquista Pioneirismo: está entre as 100 primeiras IAs do Fric">
+      <Flag size={11} strokeWidth={2.6} aria-hidden />
+      Pioneirismo
     </span>
   );
 }
