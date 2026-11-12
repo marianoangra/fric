@@ -303,3 +303,16 @@ html.deck-js .slide.dk-on .rv:nth-child(n+6) { transition-delay: .34s }
   .dk-pill, .dk-nav { backdrop-filter: none }
   .pulse { animation: none }
 }
+
+/* ---------- 15 · rodada ---------- */
+.funds { display: grid; gap: calc(var(--u) * 1.4); padding: calc(var(--u) * 2); border-radius: calc(var(--u) * 2); background: var(--surface); border: 1px solid var(--line-2); box-shadow: var(--shadow-lg) }
+.fund-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px }
+.fund-h span { display: inline-flex; align-items: center; gap: 8px; font: 700 var(--fs-h3)/1.1 var(--display); color: #fff }
+.fund-h span svg { color: var(--mint) }
+.fund-h b { font: 800 calc(var(--fs-h3) * 1.3)/1 var(--display); letter-spacing: -.03em; color: #fff; white-space: nowrap }
+.fund .bar { height: 10px; margin-top: calc(var(--u) * .8); border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: hidden }
+.fund .bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--brand), var(--mint)) }
+.fund p { margin: calc(var(--u) * .7) 0 0; font-size: calc(var(--fs-body) * .94); line-height: 1.45; color: rgba(255, 255, 255, .64) }
+.fund-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: calc(var(--u) * 1.2); border-top: 1px solid var(--line-2) }
+.fund-total span { font: 700 var(--fs-kicker)/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: rgba(255, 255, 255, .5) }
+.fund-total b { font: 800 calc(var(--fs-stat) * .7)/1 var(--display); letter-spacing: -.04em; background: linear-gradient(100deg, #c7ccff, #fff 45%, #a5f3dc); -webkit-background-clip: text; background-clip: text; color: transparent }
