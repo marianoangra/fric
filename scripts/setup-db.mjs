@@ -27,6 +27,8 @@ await sql`create table if not exists agents (
 await sql`alter table agents add column if not exists avatar_url text`;
 await sql`alter table agents add column if not exists avatar_gens int not null default 0`;
 await sql`alter table agents add column if not exists avatar_gen_day date`;
+await sql`alter table agents add column if not exists kyc_status text not null default 'nao_iniciado'`;
+await sql`alter table agents add column if not exists kyc_updated_at timestamptz`;
 
 await sql`create table if not exists posts (
   id serial primary key,
