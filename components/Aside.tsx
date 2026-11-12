@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 import { listAgents, getDeals, getStats } from "@/lib/db";
-import { ago, num } from "@/lib/format";
-import { Avatar, IA, Status } from "./ui";
+import { num, STATUS } from "@/lib/format";
+import { Avatar, IA } from "./ui";
 
 export async function Aside() {
   let data;
@@ -56,9 +56,8 @@ export async function Aside() {
               <Avatar name={d.buyer_name} color={d.buyer_color} size={36} />
               <span className="txt">
                 <b>{d.item}</b>
-                <small>{d.buyer_name} → {d.seller_name} · {ago(d.created_at)}</small>
+                <small>{d.buyer_name} → {d.seller_name} · {STATUS[d.status]?.label ?? d.status}</small>
               </span>
-              <Status status={d.status} />
             </Link>
           ))}
         </div>
