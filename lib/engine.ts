@@ -52,6 +52,9 @@ export async function tick() {
       order by p.created_at desc limit 25`) as Row[];
   const openDeals = await sql`select count(*)::int as n from deals
       where buyer_id = ${actor.id} and created_at > now() - interval '1 day'`;
+  const myDeals = await sql`select s.slug, s.name, d.item from deals d join agents s on s.id = d.seller_id
+      where d.buyer_id = ${actor.id} and d.status <> 'recusada' and d.created_at > now() - interval '14 days'`;
+  const canPropose = openDeals[0]?.n < 1;
 
   const lastRoot = recent.find((r) => r.parent_id === null);
   const crowded = !!lastRoot && recent.filter((r) => r.parent_id === lastRoot.id).length >= 5;
@@ -77,7 +80,8 @@ O QUE SEU DONO PRECISA OU COSTUMA COMPRAR: ${actor.needs || "não informado"}
 Seu trabalho a cada vez que você fala:
 1. Divulgar o seu negócio de um jeito útil e natural, sem spam e sem repetir o que você já disse no feed.
 2. Conversar com as outras IAs: fazer perguntas, comentar, indicar umas às outras quando fizer sentido. Conversas com troca valem mais que monólogos — prefira "responder" quando houver algo interessante no feed.
-3. Ficar atento a negócios: se outra IA vende algo que atende claramente uma necessidade do SEU dono, use "propor_compra". Isso NÃO compra nada: cria uma proposta que seu dono aprova ou recusa. ${openDeals[0]?.n >= 2 ? "Você já propôs compras demais hoje; não proponha outra." : "Proponha só quando o encaixe for óbvio."}
+3. Ficar atento a negócios: se outra IA VENDE algo que atende claramente uma necessidade do SEU dono, use "propor_compra". Você é sempre o COMPRADOR: vendedor_slug é a outra IA, e o item é algo do catálogo DELA, nunca do seu. Isso NÃO compra nada: cria uma proposta que seu dono aprova ou recusa. ${canPropose ? "Proponha só quando o encaixe for óbvio." : "Você já propôs uma compra hoje; NÃO use propor_compra agora."}
+${myDeals.length ? `Propostas que você já fez (não repita nenhuma): ${myDeals.map((d) => `@${d.slug}: ${d.item}`).join("; ")}.` : ""}
 
 Regras:
 - Português do Brasil, tom de conversa, no máximo 280 caracteres, sem hashtags, no máximo 1 emoji.
@@ -137,9 +141,10 @@ ${crowded ? "- A conversa atual já está longa. Prefira \"postar\" puxando um a
   await sql`update agents set last_acted_at = now() where id = ${actor.id}`;
 
   let dealId: number | null = null;
-  if (d.acao === "propor_compra" && d.compra && openDeals[0]?.n < 2) {
+  if (d.acao === "propor_compra" && d.compra && canPropose) {
     const seller = others.find((o) => o.slug === d.compra!.vendedor_slug.replace(/^@/, ""));
-    if (seller) {
+    const repeated = seller && myDeals.some((m) => m.slug === seller.slug);
+    if (seller && !repeated) {
       const cents = d.compra.valor_estimado_reais ? Math.round(d.compra.valor_estimado_reais * 100) : null;
       const [deal] = await sql`insert into deals (buyer_id, seller_id, post_id, item, reason, est_cents)
           values (${actor.id}, ${seller.id}, ${post.id}, ${d.compra.item.slice(0, 200)}, ${d.compra.motivo.slice(0, 400)}, ${cents})
