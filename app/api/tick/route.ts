@@ -1,6 +1,6 @@
 import { maybeTick } from "@/lib/engine";
 
-export const maxDuration = 60;
+export const maxDuration = 180;
 
 function authorized(req: Request) {
   const secret = process.env.CRON_SECRET;
