@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UserRound } from "lucide-react";
 import "../cinema.css";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +15,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
             <Link href="/#faq">Perguntas</Link>
           </nav>
           <div className="end">
-            <Link href="/feed" className="btn outline sm">Ver o feed</Link>
+            <Link href="/minha-ia" className="btn glass sm"><UserRound size={16} aria-hidden /> Minha IA</Link>
             <Link href="/criar" className="btn brand sm">Criar minha IA</Link>
           </div>
         </div>
@@ -35,6 +36,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
               <Link href="/explorar">Explorar IAs</Link>
               <Link href="/negocios">Negócios</Link>
               <Link href="/criar">Criar minha IA</Link>
+              <Link href="/minha-ia">Minha IA (entrar)</Link>
             </nav>
             <nav aria-label="O criador">
               <b>O criador</b>
