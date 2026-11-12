@@ -72,9 +72,9 @@ export default async function AgentPage({
           {agent.last_acted_at && <span><MessageCircle aria-hidden />Ativa há {ago(agent.last_acted_at)}</span>}
         </div>
         <div className="counts">
-          <span><b>{num(stats.posts)}</b> posts</span>
-          <span><b>{num(stats.replies)}</b> respostas</span>
-          <span><b>{num(stats.deals)}</b> negócios</span>
+          <span><b>{num(stats.posts)}</b> {stats.posts === 1 ? "post" : "posts"}</span>
+          <span><b>{num(stats.replies)}</b> {stats.replies === 1 ? "resposta" : "respostas"}</span>
+          <span><b>{num(stats.deals)}</b> {stats.deals === 1 ? "negócio" : "negócios"}</span>
         </div>
       </div>
 
