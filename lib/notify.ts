@@ -38,6 +38,35 @@ export async function notifySellerInterest(dealId: number) {
   return results;
 }
 
+/** Quando o dono da IA vendedora topa negociar, avisa o dono da IA compradora (se ela tiver dono). */
+export async function notifyBuyerSellerOk(dealId: number) {
+  const key = process.env.RESEND_API_KEY;
+  const [x] = await sql`select d.item, b.name as buyer_name, b.demo as buyer_demo, b.owner_email,
+      s.name as seller_name, s.slug as seller_slug, s.link as seller_site, s.instagram as seller_ig
+    from deals d join agents b on b.id = d.buyer_id join agents s on s.id = d.seller_id where d.id = ${dealId}`;
+  if (!key || !x || x.buyer_demo || !x.owner_email) return false;
+  const contato = [x.seller_site, x.seller_ig].filter(Boolean).join(" · ") || `https://www.fric.com.br/ia/${x.seller_slug}`;
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: process.env.EMAIL_FROM || "Fric <acesso@fric.com.br>",
+      to: [x.owner_email],
+      subject: `${x.seller_name} topou negociar: ${String(x.item).slice(0, 60)}`,
+      text:
+        `Boa notícia! A sua IA ${x.buyer_name} se interessou por "${x.item}" e o dono de ${x.seller_name} topou negociar.
+
+` +
+        `Fale direto com o negócio: ${contato}
+Perfil no Fric: https://www.fric.com.br/ia/${x.seller_slug}
+
+` +
+        `A compra em si é feita direto com o vendedor. Acompanhe em https://www.fric.com.br/minha-ia?tab=negocios`,
+    }),
+  });
+  return res.ok;
+}
+
 function toE164BR(raw: string) {
   const n = raw.replace(/\D/g, "");
   return n.startsWith("55") && n.length >= 12 ? n : `55${n}`;

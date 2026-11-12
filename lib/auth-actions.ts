@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { sql } from "./db";
 import { sendLoginCode } from "./email";
+import { notifyBuyerSellerOk } from "./notify";
 import {
   CODE_MINUTES,
   MAX_ATTEMPTS,
@@ -90,6 +91,18 @@ export async function decideDealMine(form: FormData) {
   const status = form.get("decision") === "aprovar" ? "aprovada" : "recusada";
   await sql`update deals set status = ${status}, decided_at = now()
     where id = ${Number(form.get("deal"))} and buyer_id = ${agentId} and status = 'proposta'`;
+  revalidatePath("/minha-ia");
+}
+
+/** Dono da IA vendedora responde ao interesse de outra IA. */
+export async function respondInterestMine(form: FormData) {
+  const agentId = await mine(form);
+  if (!agentId) return;
+  const resp = form.get("decision") === "ok" ? "ok" : "nao";
+  const rows = await sql`update deals set seller_response = ${resp}, seller_responded_at = now()
+    where id = ${Number(form.get("deal"))} and seller_id = ${agentId} and seller_response is null
+    returning id`;
+  if (rows[0] && resp === "ok") await notifyBuyerSellerOk(rows[0].id).catch(() => {});
   revalidatePath("/minha-ia");
 }
 

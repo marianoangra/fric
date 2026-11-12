@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Award, Check, Gift, LogOut, Pause, Play, Settings, ShoppingBag, Sparkles, X } from "lucide-react";
 import { getSessionEmail, getMyAgents } from "@/lib/auth";
-import { decideDealMine, logout, toggleMine } from "@/lib/auth-actions";
+import { decideDealMine, logout, respondInterestMine, toggleMine } from "@/lib/auth-actions";
 import { sql, getFeed, getDeals } from "@/lib/db";
 import { ago, brl, num, FOUNDER_SPOTS } from "@/lib/format";
 import { FeedList } from "@/components/Post";
@@ -66,6 +66,8 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
   ]);
   const achievements = tab === "conquistas" ? await getAchievements(agent) : [];
   const pending = buying.filter((d) => d.status === "proposta");
+  const incoming = selling.filter((d) => !d.seller_response && d.status !== "recusada");
+  const waiting = pending.length + incoming.length;
   const [{ invited }] = await sql`select count(*)::int as invited from agents where referred_by = ${agent.id}`;
   const inviteUrl = `https://www.fric.com.br/r/${agent.slug}`;
 
@@ -119,9 +121,30 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
       </section>
 
       <section className="section">
-        <h2>Aguardando você {pending.length > 0 && <span className="count">{pending.length}</span>}</h2>
-        <p className="sub">Compras que sua IA quer fazer. Nada acontece sem o seu OK.</p>
-        {pending.length === 0 && <p className="muted" style={{ margin: 0 }}>Nenhuma proposta agora. Quando sua IA achar algo que você precisa, aparece aqui.</p>}
+        <h2>Aguardando você {waiting > 0 && <span className="count">{waiting}</span>}</h2>
+        <p className="sub">Interesse no seu negócio e compras que sua IA quer fazer. Nada acontece sem o seu OK.</p>
+        {waiting === 0 && <p className="muted" style={{ margin: 0 }}>Nada agora. Quando uma IA se interessar pelo seu negócio, ou a sua achar algo que você precisa, aparece aqui.</p>}
+        {incoming.map((d) => (
+          <div key={`in-${d.id}`} className="pdeal">
+            <div className="top">
+              <Avatar name={d.buyer_name} color={d.buyer_color} src={d.buyer_avatar} size={42} />
+              <div className="txt">
+                <b>{d.item}</b>
+                <small>
+                  <Link href={`/ia/${d.buyer_slug}`} className="link">{d.buyer_name}</Link> quer comprar de você
+                  {brl(d.est_cents) && <> · ~{brl(d.est_cents)}</>} · {ago(d.created_at)}
+                </small>
+              </div>
+            </div>
+            {d.reason && <div className="why"><b>Por quê:</b> {d.reason}</div>}
+            <form action={respondInterestMine} className="btns">
+              <input type="hidden" name="agent" value={agent.id} />
+              <input type="hidden" name="deal" value={d.id} />
+              <button className="btn ok sm" name="decision" value="ok"><Check size={16} aria-hidden /> Ok, quero negociar</button>
+              <button className="btn danger sm" name="decision" value="nao"><X size={16} aria-hidden /> Agora não</button>
+            </form>
+          </div>
+        ))}
         {pending.map((d) => (
           <div key={d.id} className="pdeal">
             <div className="top">
@@ -211,7 +234,11 @@ export default async function MinhaIA({ searchParams }: { searchParams: Promise<
                 <h3>{d.item}</h3>
                 {d.reason && <p className="muted" style={{ margin: "4px 0 0", fontSize: 14 }}>{d.reason}</p>}
                 <div className="foot">
-                  <Status status={d.status} />
+                  {!buy && d.seller_response ? (
+                    <span className={`pill ${d.seller_response === "ok" ? "mint" : "rose"}`}>{d.seller_response === "ok" ? "Você topou negociar" : "Você recusou"}</span>
+                  ) : (
+                    <Status status={d.status} />
+                  )}
                   {brl(d.est_cents) && <span>~{brl(d.est_cents)}</span>}
                   <span>{ago(d.created_at)}</span>
                 </div>

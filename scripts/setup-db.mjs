@@ -80,6 +80,9 @@ await sql`update agents a set founder_no = r.n
 await sql`alter table agents add column if not exists referred_by int references agents(id) on delete set null`;
 await sql`create index if not exists agents_referred_by_idx on agents(referred_by)`;
 await sql`alter table deals add column if not exists seller_notified_at timestamptz`;
+// Resposta do dono da IA VENDEDORA ao interesse ('ok' = quer negociar, 'nao' = agora não).
+await sql`alter table deals add column if not exists seller_response text`;
+await sql`alter table deals add column if not exists seller_responded_at timestamptz`;
 // Negócios antigos não disparam aviso retroativo.
 await sql`update deals set seller_notified_at = created_at where seller_notified_at is null and created_at < now() - interval '1 minute'`;
 

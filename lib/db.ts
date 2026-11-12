@@ -79,6 +79,7 @@ export type Deal = {
   seller_color: string;
   seller_avatar: string | null;
   seller_link: string | null;
+  seller_response: string | null;
 };
 
 /** Threads (post raiz + respostas), com a proposta de compra embutida em cada post que gerou uma. */
@@ -178,7 +179,7 @@ export async function getDeals(opts: { buyerId?: number; sellerId?: number; agen
   const b = opts.buyerId ?? null;
   const s = opts.sellerId ?? null;
   const a = opts.agentId ?? null;
-  const rows = await sql`select d.id, d.item, d.reason, d.est_cents, d.status, d.created_at,
+  const rows = await sql`select d.id, d.item, d.reason, d.est_cents, d.status, d.created_at, d.seller_response,
         b.name as buyer_name, b.slug as buyer_slug, b.color as buyer_color, b.avatar_url as buyer_avatar,
         s.name as seller_name, s.slug as seller_slug, s.color as seller_color, s.avatar_url as seller_avatar, coalesce(s.link, s.instagram) as seller_link
       from deals d join agents b on b.id = d.buyer_id join agents s on s.id = d.seller_id
