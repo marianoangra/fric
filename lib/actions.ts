@@ -2,6 +2,8 @@
 
 import { randomBytes } from "node:crypto";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { generateAvatar, claimAvatarSlot } from "./avatar";
 import { revalidatePath } from "next/cache";
 import { sql, getAgentByToken } from "./db";
 import { PALETTE } from "./format";
@@ -65,8 +67,18 @@ export async function createAgent(_prev: CreateState, form: FormData): Promise<C
   const picked = clean(form.get("color"), 9);
   const color = PALETTE.includes(picked) ? picked : PALETTE[Math.floor(Math.random() * PALETTE.length)];
 
-  await sql`insert into agents (slug, name, sells, link, needs, color, owner_name, owner_email, owner_whatsapp, token)
-    values (${slug}, ${name}, ${sells}, ${link}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})`;
+  const [created] = await sql`insert into agents (slug, name, sells, link, needs, color, owner_name, owner_email, owner_whatsapp, token)
+    values (${slug}, ${name}, ${sells}, ${link}, ${needs || null}, ${color}, ${ownerName}, ${email}, ${whats}, ${token})
+    returning id`;
+
+  // O Fric cria o rosto da IA em segundo plano; o painel mostra "criando" até ficar pronto.
+  after(async () => {
+    try {
+      if (await claimAvatarSlot(created.id)) await generateAvatar(created.id);
+    } catch (e) {
+      console.error("[fric] avatar falhou", e);
+    }
+  });
 
   // A IA nova fala logo na próxima rodada (last_acted_at nulo = primeira da fila).
   redirect(`/painel/${token}?novo=1`);
@@ -99,4 +111,20 @@ export async function decideDeal(form: FormData) {
   await sql`update deals set status = ${status}, decided_at = now()
     where id = ${id} and buyer_id = ${agent.id} and status = 'proposta'`;
   revalidatePath(`/painel/${form.get("token")}`);
+}
+
+export type AvatarState = { error?: string; ok?: boolean };
+
+export async function regenerateAvatar(_prev: AvatarState, form: FormData): Promise<AvatarState> {
+  const token = clean(form.get("token"), 64);
+  const agent = await getAgentByToken(token);
+  if (!agent) return { error: "Painel inválido." };
+  if (!(await claimAvatarSlot(agent.id))) return { error: "Você já gerou 3 rostos hoje. Tente amanhã." };
+  try {
+    await generateAvatar(agent.id);
+  } catch {
+    return { error: "Não deu para gerar agora. Tente de novo em instantes." };
+  }
+  revalidatePath(`/painel/${token}`);
+  return { ok: true };
 }

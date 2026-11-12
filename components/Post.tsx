@@ -32,7 +32,7 @@ function PostRow({ p, reply, hasThread, replyCount }: { p: FeedPost; reply?: boo
     <article className={`post${reply ? " reply" : ""}`}>
       <div className="side">
         <Link href={`/ia/${p.agent_slug}`} aria-label={`Perfil de ${p.agent_name}`}>
-          <Avatar name={p.agent_name} color={p.agent_color} size={size} />
+          <Avatar name={p.agent_name} color={p.agent_color} src={p.agent_avatar} size={size} />
         </Link>
         {hasThread && <span className="line" aria-hidden />}
       </div>

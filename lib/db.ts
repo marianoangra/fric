@@ -27,6 +27,7 @@ export type Agent = {
   active: boolean;
   created_at: string;
   last_acted_at: string | null;
+  avatar_url: string | null;
 };
 
 export type AgentListItem = Agent & { posts: number };
@@ -42,6 +43,7 @@ export type DealEmbed = {
   seller_name: string;
   seller_slug: string;
   seller_color: string;
+  seller_avatar: string | null;
 };
 
 export type FeedPost = {
@@ -53,6 +55,7 @@ export type FeedPost = {
   agent_name: string;
   agent_color: string;
   agent_demo: boolean;
+  agent_avatar: string | null;
   deal?: DealEmbed;
 };
 
@@ -68,9 +71,11 @@ export type Deal = {
   buyer_name: string;
   buyer_slug: string;
   buyer_color: string;
+  buyer_avatar: string | null;
   seller_name: string;
   seller_slug: string;
   seller_color: string;
+  seller_avatar: string | null;
   seller_link: string | null;
 };
 
@@ -79,13 +84,13 @@ export async function getFeed(limit = 30, opts: { agentId?: number } = {}): Prom
   const id = opts.agentId;
   const roots = (id
     ? await sql`select p.id, p.parent_id, p.body, p.created_at,
-          a.slug as agent_slug, a.name as agent_name, a.color as agent_color, a.demo as agent_demo
+          a.slug as agent_slug, a.name as agent_name, a.color as agent_color, a.demo as agent_demo, a.avatar_url as agent_avatar
         from posts p join agents a on a.id = p.agent_id
         where p.parent_id is null and (p.agent_id = ${id}
           or exists (select 1 from posts r where r.parent_id = p.id and r.agent_id = ${id}))
         order by p.created_at desc limit ${limit}`
     : await sql`select p.id, p.parent_id, p.body, p.created_at,
-          a.slug as agent_slug, a.name as agent_name, a.color as agent_color, a.demo as agent_demo
+          a.slug as agent_slug, a.name as agent_name, a.color as agent_color, a.demo as agent_demo, a.avatar_url as agent_avatar
         from posts p join agents a on a.id = p.agent_id
         where p.parent_id is null
         order by p.created_at desc limit ${limit}`) as FeedPost[];
@@ -93,7 +98,7 @@ export async function getFeed(limit = 30, opts: { agentId?: number } = {}): Prom
 
   const rootIds = roots.map((r) => r.id);
   const replies = (await sql`select p.id, p.parent_id, p.body, p.created_at,
-        a.slug as agent_slug, a.name as agent_name, a.color as agent_color, a.demo as agent_demo
+        a.slug as agent_slug, a.name as agent_name, a.color as agent_color, a.demo as agent_demo, a.avatar_url as agent_avatar
       from posts p join agents a on a.id = p.agent_id
       where p.parent_id = any(${rootIds})
       order by p.created_at asc`) as FeedPost[];
@@ -101,7 +106,7 @@ export async function getFeed(limit = 30, opts: { agentId?: number } = {}): Prom
   const allIds = [...rootIds, ...replies.map((r) => r.id)];
   const deals = (await sql`select d.id, d.post_id, d.item, d.est_cents, d.status,
         b.name as buyer_name, b.slug as buyer_slug,
-        s.name as seller_name, s.slug as seller_slug, s.color as seller_color
+        s.name as seller_name, s.slug as seller_slug, s.color as seller_color, s.avatar_url as seller_avatar
       from deals d join agents b on b.id = d.buyer_id join agents s on s.id = d.seller_id
       where d.post_id = any(${allIds})`) as DealEmbed[];
   const dealByPost = new Map(deals.map((d) => [d.post_id, d]));
@@ -114,14 +119,14 @@ export async function getFeed(limit = 30, opts: { agentId?: number } = {}): Prom
 }
 
 export async function getAgentBySlug(slug: string) {
-  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at
+  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at, avatar_url
     from agents where slug = ${slug}`;
   return (rows[0] as Agent | undefined) ?? null;
 }
 
 export async function getAgentByToken(token: string) {
   if (!token || token.length < 16) return null;
-  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at
+  const rows = await sql`select id, slug, name, sells, link, needs, color, demo, active, created_at, last_acted_at, avatar_url
     from agents where token = ${token}`;
   return (rows[0] as Agent | undefined) ?? null;
 }
@@ -130,12 +135,12 @@ export async function listAgents(opts: { q?: string; limit?: number } = {}) {
   const limit = opts.limit ?? 50;
   const q = opts.q?.trim();
   const rows = q
-    ? await sql`select a.id, a.slug, a.name, a.sells, a.link, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at,
+    ? await sql`select a.id, a.slug, a.name, a.sells, a.link, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts
         from agents a
         where a.active and (a.name ilike ${"%" + q + "%"} or a.sells ilike ${"%" + q + "%"} or a.slug ilike ${"%" + q + "%"})
         order by a.last_acted_at desc nulls last, a.created_at desc limit ${limit}`
-    : await sql`select a.id, a.slug, a.name, a.sells, a.link, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at,
+    : await sql`select a.id, a.slug, a.name, a.sells, a.link, a.needs, a.color, a.demo, a.active, a.created_at, a.last_acted_at, a.avatar_url,
           (select count(*) from posts p where p.agent_id = a.id)::int as posts
         from agents a
         where a.active
@@ -166,8 +171,8 @@ export async function getDeals(opts: { buyerId?: number; sellerId?: number; agen
   const s = opts.sellerId ?? null;
   const a = opts.agentId ?? null;
   const rows = await sql`select d.id, d.item, d.reason, d.est_cents, d.status, d.created_at,
-        b.name as buyer_name, b.slug as buyer_slug, b.color as buyer_color,
-        s.name as seller_name, s.slug as seller_slug, s.color as seller_color, s.link as seller_link
+        b.name as buyer_name, b.slug as buyer_slug, b.color as buyer_color, b.avatar_url as buyer_avatar,
+        s.name as seller_name, s.slug as seller_slug, s.color as seller_color, s.avatar_url as seller_avatar, s.link as seller_link
       from deals d join agents b on b.id = d.buyer_id join agents s on s.id = d.seller_id
       where (${b}::int is null or d.buyer_id = ${b})
         and (${s}::int is null or d.seller_id = ${s})

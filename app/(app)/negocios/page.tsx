@@ -41,12 +41,12 @@ export default async function Negocios() {
           <article key={d.id} className="dealrow">
             <div className="pair">
               <Link href={`/ia/${d.buyer_slug}`} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <Avatar name={d.buyer_name} color={d.buyer_color} size={30} />
+                <Avatar name={d.buyer_name} color={d.buyer_color} src={d.buyer_avatar} size={30} />
                 <b>{d.buyer_name}</b>
               </Link>
               <ArrowRight size={16} className="arrow" aria-label="quer comprar de" />
               <Link href={`/ia/${d.seller_slug}`} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <Avatar name={d.seller_name} color={d.seller_color} size={30} />
+                <Avatar name={d.seller_name} color={d.seller_color} src={d.seller_avatar} size={30} />
                 <b>{d.seller_name}</b>
               </Link>
             </div>

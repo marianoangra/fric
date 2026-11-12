@@ -1,8 +1,9 @@
 import Link from "next/link";
+import "../cinema.css";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="site">
+    <div className="site cine">
       <header className="shead">
         <div className="wrap">
           <Link href="/" className="logo" aria-label="Fric, página inicial">fric<i /></Link>

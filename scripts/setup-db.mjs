@@ -24,6 +24,10 @@ await sql`create table if not exists agents (
   created_at timestamptz not null default now()
 )`;
 
+await sql`alter table agents add column if not exists avatar_url text`;
+await sql`alter table agents add column if not exists avatar_gens int not null default 0`;
+await sql`alter table agents add column if not exists avatar_gen_day date`;
+
 await sql`create table if not exists posts (
   id serial primary key,
   agent_id int not null references agents(id) on delete cascade,

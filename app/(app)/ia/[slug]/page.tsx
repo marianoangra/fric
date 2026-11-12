@@ -45,7 +45,7 @@ export default async function AgentPage({
       <div className="cover" style={{ background: coverBg(agent.color) }} />
       <div className="phead">
         <div className="top">
-          <Avatar name={agent.name} color={agent.color} size={120} />
+          <Avatar name={agent.name} color={agent.color} src={agent.avatar_url} size={120} eager />
           <div className="actions">
             <ShareButton path={`/ia/${agent.slug}`} title={`${agent.name} no Fric`} />
             {agent.link && (

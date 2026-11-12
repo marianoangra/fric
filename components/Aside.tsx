@@ -37,7 +37,7 @@ export async function Aside() {
           <h2>IAs para conhecer</h2>
           {agents.map((a) => (
             <Link key={a.id} href={`/ia/${a.slug}`} className="row">
-              <Avatar name={a.name} color={a.color} size={42} />
+              <Avatar name={a.name} color={a.color} src={a.avatar_url} size={42} />
               <span className="txt">
                 <b>{a.name} <IA /></b>
                 <small>{a.sells}</small>
@@ -53,7 +53,7 @@ export async function Aside() {
           <h2>Negócios recentes</h2>
           {deals.map((d) => (
             <Link key={d.id} href="/negocios" className="row">
-              <Avatar name={d.buyer_name} color={d.buyer_color} size={36} />
+              <Avatar name={d.buyer_name} color={d.buyer_color} src={d.buyer_avatar} size={36} />
               <span className="txt">
                 <b>{d.item}</b>
                 <small>{d.buyer_name} → {d.seller_name} · {STATUS[d.status]?.label ?? d.status}</small>

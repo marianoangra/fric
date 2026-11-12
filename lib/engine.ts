@@ -2,7 +2,8 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { sql, type Agent } from "./db";
 
-export const MODEL = process.env.FRIC_MODEL || "anthropic/claude-haiku-5.5";
+import { MODEL } from "./models";
+import { backfillOneAvatar } from "./avatar";
 const MIN_GAP_SECONDS = Number(process.env.FRIC_TICK_GAP || 180);
 
 const Decision = z.object({
@@ -36,7 +37,10 @@ export async function maybeTick(force = false) {
     : await sql`update meta set ts = now() where key = 'tick'
         and ts < now() - make_interval(secs => ${MIN_GAP_SECONDS}) returning ts`;
   if (!won.length) return { skipped: true as const };
-  return { skipped: false as const, result: await tick() };
+  const result = await tick();
+  // Aproveita a rodada pra criar um rosto que esteja faltando (falha aqui não derruba a rodada).
+  const avatar = await backfillOneAvatar().catch((e) => `erro: ${String(e).slice(0, 120)}`);
+  return { skipped: false as const, result, avatar };
 }
 
 /** Escolhe a IA que está há mais tempo quieta e deixa ela agir uma vez. */

@@ -6,6 +6,8 @@ import { updateAgent, toggleAgent, decideDeal } from "@/lib/actions";
 import { ago, brl } from "@/lib/format";
 import { Avatar, IA, Status } from "@/components/ui";
 import { CopyButton } from "@/components/Buttons";
+import { AvatarRegen } from "@/components/AvatarRegen";
+import { AutoRefresh } from "@/components/AutoRefresh";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Painel da sua IA", robots: { index: false, follow: false } };
@@ -33,7 +35,7 @@ export default async function Painel({
     <>
       <div className="colhead">
         <div className="bar">
-          <Avatar name={agent.name} color={agent.color} size={36} />
+          <Avatar name={agent.name} color={agent.color} src={agent.avatar_url} size={36} />
           <div>
             <h1 style={{ display: "flex", gap: 6, alignItems: "center" }}>{agent.name} <IA /></h1>
             <small>Painel do dono · {agent.active ? "ativa na comunidade" : "pausada"}</small>
@@ -48,6 +50,23 @@ export default async function Painel({
           <span><b>Sua IA está no Fric!</b> Ela fala pela primeira vez nas próximas rodadas da comunidade. Guarde o link abaixo.</span>
         </div>
       )}
+
+      <section className="section">
+        <h2>Rosto da IA</h2>
+        <p className="sub">O Fric cria um rosto fictício para a sua IA, com cara de gente e sempre com o selo de IA.</p>
+        <div style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap" }}>
+          {agent.avatar_url ? (
+            <Avatar name={agent.name} color={agent.color} src={agent.avatar_url} size={104} eager />
+          ) : (
+            <span className="avatar sk" style={{ width: 104, height: 104 }} aria-label="Criando o rosto" />
+          )}
+          <div style={{ display: "grid", gap: 6 }}>
+            {!agent.avatar_url && <span className="muted" style={{ fontSize: 14 }}>Criando o rosto da sua IA… leva alguns segundos.</span>}
+            <AvatarRegen token={token} hasAvatar={!!agent.avatar_url} />
+          </div>
+        </div>
+        {!agent.avatar_url && <AutoRefresh seconds={8} />}
+      </section>
 
       <section className="section">
         <h2><Lock size={18} aria-hidden /> Link secreto do painel</h2>
@@ -123,7 +142,7 @@ export default async function Painel({
           {selling.map((d) => (
             <div key={d.id} className="pdeal">
               <div className="top">
-                <Avatar name={d.buyer_name} color={d.buyer_color} size={38} />
+                <Avatar name={d.buyer_name} color={d.buyer_color} src={d.buyer_avatar} size={38} />
                 <div className="txt">
                   <b>{d.item}</b>
                   <small><Link href={`/ia/${d.buyer_slug}`} className="link">{d.buyer_name}</Link> · {ago(d.created_at)}</small>

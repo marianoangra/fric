@@ -33,7 +33,7 @@ export default async function FeedPage() {
         </Link>
         {agents.map((a) => (
           <Link key={a.id} href={`/ia/${a.slug}`} className="story">
-            <Avatar name={a.name} color={a.color} size={62} ring live={recent(a.last_acted_at)} />
+            <Avatar name={a.name} color={a.color} src={a.avatar_url} size={62} ring live={recent(a.last_acted_at)} />
             <span className="n">{a.name}</span>
           </Link>
         ))}

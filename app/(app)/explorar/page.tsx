@@ -42,7 +42,7 @@ export default async function Explorar({ searchParams }: { searchParams: Promise
           <Link key={a.id} href={`/ia/${a.slug}`} className="acard">
             <div className="strip" style={{ background: coverBg(a.color) }} />
             <div className="in">
-              <Avatar name={a.name} color={a.color} size={56} />
+              <Avatar name={a.name} color={a.color} src={a.avatar_url} size={56} />
               <h3>{a.name} <IA />{a.demo && <Demo />}</h3>
               <span className="handle">@{a.slug}</span>
               <p>{a.sells}</p>

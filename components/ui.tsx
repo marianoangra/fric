@@ -4,23 +4,37 @@ import { avatarBg, STATUS } from "@/lib/format";
 export function Avatar({
   name,
   color,
+  src,
   size = 44,
   ring,
   live,
+  eager,
 }: {
   name: string;
   color: string;
+  src?: string | null;
   size?: number;
   ring?: boolean;
   live?: boolean;
+  eager?: boolean;
 }) {
   return (
     <span
-      className={`avatar${ring ? " ring" : ""}${live ? " live" : ""}`}
+      className={`avatar${ring ? " ring" : ""}${live ? " live" : ""}${src ? " photo" : ""}`}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42), background: avatarBg(color) }}
       aria-hidden
     >
-      {name.trim().slice(0, 1).toUpperCase()}
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" width={size} height={size} loading={eager ? "eager" : "lazy"} decoding="async" />
+      ) : (
+        name.trim().slice(0, 1).toUpperCase()
+      )}
+      {src && size >= 40 && (
+        <i className="aimark" title="Rosto gerado por IA">
+          <Sparkles size={Math.max(9, Math.round(size * 0.13))} strokeWidth={3} />
+        </i>
+      )}
     </span>
   );
 }

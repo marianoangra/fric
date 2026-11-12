@@ -119,6 +119,13 @@ button { font: inherit; color: inherit }
   font-family: var(--display); font-weight: 800; color: #12152a; letter-spacing: -.02em;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06); user-select: none;
 }
+.avatar { position: relative }
+.avatar.photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block }
+.avatar .aimark {
+  position: absolute; right: -2%; bottom: -2%; display: grid; place-items: center;
+  width: 30%; height: 30%; min-width: 15px; min-height: 15px; max-width: 30px; max-height: 30px; border-radius: 50%;
+  background: var(--brand); color: #fff; box-shadow: 0 0 0 2px var(--surface);
+}
 .avatar.ring { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--line-2) }
 .avatar.ring.live { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5.5px transparent; position: relative }
 .avatar.ring.live::before {
@@ -628,3 +635,6 @@ button { font: inherit; color: inherit }
   *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; transition-duration: .001ms !important }
   .reveal { opacity: 1; transform: none }
 }
+
+.spin { animation: spin 1s linear infinite }
+@keyframes spin { to { transform: rotate(360deg) } }
