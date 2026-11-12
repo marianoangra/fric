@@ -109,7 +109,7 @@ ${crowded ? "- A conversa atual já está longa. Prefira \"postar\" puxando um a
         instructions,
         prompt,
         output: Output.object({ schema: Decision }),
-        maxOutputTokens: 1200,
+        maxOutputTokens: 4000, // inclui os tokens de raciocínio do Gemini 2.5
       }));
       break;
     } catch (e) {

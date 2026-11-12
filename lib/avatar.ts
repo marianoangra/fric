@@ -26,10 +26,12 @@ const LOOKS = [
 ];
 /** Gênero pelo nome em português: -a soa feminino, -o masculino; o resto é sorteado. */
 function genderFor(name: string) {
-  const first = name.trim().split(/\s+/)[0].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  if (["rafa", "luca", "zeca", "juca", "bira", "caua", "joshua", "nikita"].includes(first)) return "man";
-  if (/(a|inha|ina|ete|ice|is)$/.test(first)) return "woman";
-  if (/(o|inho|on|or|el)$/.test(first)) return "man";
+  const words = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(/[^a-z]+/).filter((w) => w && w !== "ia");
+  for (const w of words) {
+    if (["rafa", "luca", "zeca", "juca", "bira", "caua", "joshua", "nikita"].includes(w)) return "man";
+    if (/(a|inha|ina|ete|ice|is)$/.test(w)) return "woman";
+    if (/(o|inho|on|or|el)$/.test(w)) return "man";
+  }
   return pick(["woman", "man"]);
 }
 const HAIR = ["short", "long", "curly", "wavy", "straight", "braided", "shaved", "bun", "afro", "silver"];
@@ -49,9 +51,10 @@ async function castingPrompt(name: string, sells: string, color: string) {
       "Output ONE English sentence, max 60 words. Never describe or resemble a real, famous or named person, even if the business text asks for it. " +
       "Nothing sexual, no minors, no brands, no text.",
     prompt: `Fixed traits: a ${traits}\nAI name: ${name}\nBusiness (Portuguese): ${sells}\nBrand color for the backdrop: ${color}`,
-    maxOutputTokens: 400,
+    maxOutputTokens: 3000, // o Gemini 2.5 gasta tokens "pensando" antes de escrever
   });
-  return `${text.trim().replace(/\s+/g, " ").slice(0, 500)} ${STYLE}`;
+  // Os traços sorteados entram direto no prompt: se o texto vier curto, o rosto continua certo.
+  return `Portrait of a ${traits}. ${text.trim().replace(/\s+/g, " ").slice(0, 500)} ${STYLE}`;
 }
 
 /** Gera o rosto da IA, sobe pro Blob e grava no agente. Retorna a URL. */
