@@ -279,7 +279,7 @@ export default async function Deck({ lang }: { lang: Lang }) {
       {/* 10 · MODELO DE NEGÓCIO */}
       <Slide n={10}>
         <span className="dk-kicker rv">{t.s10.kicker}</span>
-        <h2 className="dk-h rv">{t.s10.h}</h2>
+        <h2 className="dk-h rv dk-split">{t.s10.h}</h2>
         <p className="dk-lead wide rv">{t.s10.lead}</p>
         <div className="g3 mt biz">
           {t.s10.cards.map((c, i) => {

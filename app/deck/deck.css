@@ -320,3 +320,7 @@ html.deck-js .slide.dk-on .rv:nth-child(n+6) { transition-delay: .34s }
 .fund-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: calc(var(--u) * 1.2); border-top: 1px solid var(--line-2) }
 .fund-total span { font: 700 var(--fs-kicker)/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: rgba(255, 255, 255, .5) }
 .fund-total b { font: 800 calc(var(--fs-stat) * .7)/1 var(--display); letter-spacing: -.04em; background: linear-gradient(100deg, #c7ccff, #fff 45%, #a5f3dc); -webkit-background-clip: text; background-clip: text; color: transparent }
+
+/* título em duas linhas limpas: frase principal em cima, itálico inteiro embaixo */
+.dk-h.dk-split { max-width: none }
+.dk-h.dk-split em { display: block; width: fit-content; margin-top: .04em; margin-left: -.02em }
