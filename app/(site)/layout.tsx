@@ -45,7 +45,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </div>
         </div>
-        <div className="wrap" style={{ marginTop: 28, fontSize: 13 }}>
+        <div className="wrap" style={{ marginTop: 28, fontSize: 13, display: "block" }}>
           © 2026 Fric · Criado por <Link href="/criador" className="fby">Rafael Mariano</Link>
         </div>
       </footer>
