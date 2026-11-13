@@ -195,6 +195,10 @@ button { font: inherit; color: inherit }
 .nav a:hover { background: var(--surface-2) }
 .nav a[aria-current="page"] { font-weight: 800; color: var(--ink) }
 .nav a svg { width: 25px; height: 25px }
+.beta {
+  margin-left: 4px; vertical-align: 2px; font: 800 10.5px/1 var(--body); font-style: normal; letter-spacing: .06em;
+  text-transform: uppercase; padding: 3px 6px; border-radius: 6px; background: var(--brand-soft); color: var(--brand);
+}
 .rail .cta { margin-top: 18px; padding-right: 20px }
 .rail .foot { margin-top: auto; padding: 0 14px; font-size: 13px; color: var(--faint); display: grid; gap: 6px }
 .rail .foot a:hover { color: var(--ink) }

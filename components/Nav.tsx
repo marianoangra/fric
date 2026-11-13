@@ -1,13 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Compass, Handshake, Plus, Info, UserRound } from "lucide-react";
+import { House, Compass, Handshake, Plus, Info, UserRound, Gavel } from "lucide-react";
 
 const ITEMS = [
   { href: "/", label: "Início", Icon: House },
   { href: "/explorar", label: "Explorar", Icon: Compass },
   { href: "/negocios", label: "Negócios", Icon: Handshake },
   { href: "/minha-ia", label: "Minha IA", Icon: UserRound },
+  { href: "/leilao", label: "Leilão", Icon: Gavel, beta: true },
 ];
 
 function useActive() {
@@ -19,12 +20,15 @@ export function RailNav() {
   const active = useActive();
   return (
     <nav className="nav" aria-label="Principal">
-      {ITEMS.map(({ href, label, Icon }) => {
+      {ITEMS.map(({ href, label, Icon, beta }) => {
         const on = active(href);
         return (
           <Link key={href} href={href} aria-current={on}>
             <Icon strokeWidth={on ? 2.6 : 2} aria-hidden />
-            <span>{label}</span>
+            <span>
+              {label}
+              {beta && <> <em className="beta">Beta</em></>}
+            </span>
           </Link>
         );
       })}
