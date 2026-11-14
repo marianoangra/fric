@@ -1,0 +1,19 @@
+# /etc/systemd/system/leila-gate.service
+# O token fica em /etc/leila-gate.env (chmod 600), linha única: LEILA_TOKEN=...
+[Unit]
+Description=leila-gate (porteiro do Ollama para o fric.com.br/leilao)
+After=network-online.target ollama.service
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/leila-gate.env
+ExecStart=/usr/bin/python3 /opt/leila-gate/leila-gate.py
+Restart=always
+RestartSec=3
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target
