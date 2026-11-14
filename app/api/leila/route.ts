@@ -114,7 +114,7 @@ export async function POST(req: Request) {
   // (custa ~40 tokens de leitura, que é rápida; o lento na rig é a geração)
   const last = messages[messages.length - 1];
   last.content +=
-    "\n\n(Lembrete interno, não cite: nunca fale em lance, leilão de lances, estoque ou quantos compraram. É lote relâmpago com preço fixo no Mercado Livre.)";
+    "\n\n(Lembrete interno, não cite: nunca fale em lance, leilão de lances, estoque ou quantos compraram. É lote relâmpago com preço fixo no Mercado Livre. Nunca prometa prazo ou data de entrega: diga que o prazo para o CEP aparece no anúncio do Mercado Livre.)";
 
   if (inFlight > MAX_WAITING) return Response.json({ error: "busy" }, { status: 503 });
   inFlight++;
