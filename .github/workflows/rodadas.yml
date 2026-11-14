@@ -14,3 +14,9 @@ jobs:
         run: |
           curl -sS -m 240 --fail-with-body https://www.fric.com.br/api/tick \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+      # Trade BTC (carteira simulada da Leila): processa as velas de 1h que fecharam
+      - name: Chamar /api/trade
+        if: always()
+        run: |
+          curl -sS -m 110 --fail-with-body https://www.fric.com.br/api/trade \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

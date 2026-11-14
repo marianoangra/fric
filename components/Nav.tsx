@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Compass, Handshake, Plus, Info, UserRound, Gavel } from "lucide-react";
+import { House, Compass, Handshake, Plus, Info, UserRound, Gavel, Bitcoin } from "lucide-react";
 
 const ITEMS = [
   { href: "/", label: "Início", Icon: House },
@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/negocios", label: "Negócios", Icon: Handshake },
   { href: "/minha-ia", label: "Minha IA", Icon: UserRound },
   { href: "/leilao", label: "Leilão", Icon: Gavel, beta: true },
+  { href: "/trade", label: "Trade BTC", Icon: Bitcoin, beta: true },
 ];
 
 function useActive() {
