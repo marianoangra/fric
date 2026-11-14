@@ -41,27 +41,47 @@
 .trd-kpi em { font-style: normal; font-weight: 700 }
 
 /* gráfico */
-.trd-chart { padding: 12px 12px 6px }
+.trd-chart { padding: 12px 12px 10px; --m200: #7c3aed; --m4y: #db2777 }
+@media (prefers-color-scheme: dark) { .trd-chart { --m200: #a78bfa; --m4y: #f472b6 } }
 .trd-chart svg { display: block; width: 100%; height: auto }
-.trd-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 2px 6px 8px; font-size: 12.5px; color: var(--muted) }
-.trd-legend span { display: inline-flex; align-items: center; gap: 6px }
-.trd-legend small { margin-left: auto; font-weight: 700 }
-.trd-legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block }
-.trd-legend i.p { background: var(--ink) }
+.trd-seg { display: flex; gap: 4px; padding: 3px; margin: 0 4px 10px; border-radius: 999px; background: var(--surface-2); width: fit-content; max-width: 100% }
+.trd-seg a { padding: 7px 12px; border-radius: 999px; font: 700 12.5px/1 var(--body); color: var(--muted); white-space: nowrap }
+.trd-seg a[aria-current="page"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm) }
+.trd-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 0 6px 8px; font-size: 12.5px; color: var(--muted) }
+.trd-legend span, .trd-levels span { display: inline-flex; align-items: center; gap: 6px }
+.trd-legend i, .trd-levels i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; flex: none }
+.trd-legend i.cu, .trd-legend i.cd { width: 6px; height: 12px; border-radius: 1px }
+.trd-legend i.cu { background: var(--mint) }
+.trd-legend i.cd { background: var(--rose); margin-left: -3px }
 .trd-legend i.f { background: var(--brand) }
 .trd-legend i.s { background: var(--sun-bg) }
-.trd-legend i.b, .trd-legend i.v { width: 9px; height: 9px; border-radius: 50% }
-.trd-legend i.b { background: var(--mint) }
-.trd-legend i.v { background: var(--rose) }
+i.m200 { background: var(--m200) }
+i.m4y { background: var(--m4y) }
+.trd-legend i.b, .trd-legend i.v { width: 0; height: 0; border-radius: 0; background: none; border-inline: 5px solid transparent }
+.trd-legend i.b { border-bottom: 8px solid var(--mint) }
+.trd-legend i.v { border-top: 8px solid var(--rose) }
 .trd-chart .grid { stroke: var(--line); stroke-width: 1 }
 .trd-chart .tick { fill: var(--faint); font: 600 11px var(--body) }
+.trd-chart .cu line { stroke: var(--mint) }
+.trd-chart .cu rect { fill: var(--mint) }
+.trd-chart .cd line { stroke: var(--rose) }
+.trd-chart .cd rect { fill: var(--rose) }
 .trd-chart path { fill: none; stroke-linejoin: round; stroke-linecap: round }
-.trd-chart .price { stroke: var(--ink); stroke-width: 2 }
 .trd-chart .ema-f { stroke: var(--brand); stroke-width: 1.6 }
 .trd-chart .ema-s { stroke: var(--sun-bg); stroke-width: 1.6 }
-.trd-chart circle.buy { fill: var(--mint); stroke: var(--surface); stroke-width: 2 }
-.trd-chart circle.sell { fill: var(--rose); stroke: var(--surface); stroke-width: 2 }
-.trd-chart circle.now { fill: var(--ink) }
+.trd-chart path.ma200 { stroke: var(--m200); stroke-width: 1.8 }
+.trd-chart path.ma4y { stroke: var(--m4y); stroke-width: 1.8 }
+.trd-chart .lvl { stroke-width: 1.4; stroke-dasharray: 5 4 }
+.trd-chart .lvl.ma200 { stroke: var(--m200) }
+.trd-chart .lvl.ma4y { stroke: var(--m4y) }
+.trd-chart .lvl-t { font: 700 11px var(--body) }
+.trd-chart .lvl-t.ma200 { fill: var(--m200) }
+.trd-chart .lvl-t.ma4y { fill: var(--m4y) }
+.trd-chart path.buy { fill: var(--mint); stroke: var(--surface); stroke-width: 1.5 }
+.trd-chart path.sell { fill: var(--rose); stroke: var(--surface); stroke-width: 1.5 }
+.trd-levels { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 8px 6px 0; font-size: 13px; color: var(--muted) }
+.trd-levels b { color: var(--ink) }
+.trd-explain { margin: 8px 6px 0; font-size: 12.5px; line-height: 1.5; color: var(--faint) }
 
 /* plano de acompanhamento */
 .trd-tabs { border-bottom: 1px solid var(--line); overflow-x: auto }

@@ -1,5 +1,5 @@
 /**
- * Trade BTC — carteira SIMULADA da Leila com preço REAL (Binance, par BTC/BRL, velas de 1h).
+ * Trade BTC — carteira SIMULADA da Leila com preço REAL (Binance, par BTC/USDT, velas de 1h, valores em dólar).
  *
  * Quem decide são regras públicas e fixas (ver RULES). A IA só explica: cada operação e cada
  * período (12h, dia, semana, mês) ganham um comentário da Leila. Nada de dinheiro de verdade.
@@ -14,15 +14,16 @@ import { sql } from "./db";
 import { MODEL } from "./models";
 
 import {
-  API, H, RULES, KINDS, REASON_TXT, periodOf, indicators, step,
+  API, H, RULES, KINDS, REASON_TXT, periodOf, indicators, step, longLevels,
   type Candle, type Fill, type Kind, type Reason, type SimState,
 } from "./trade-core";
 
 export * from "./trade-core";
 
-export async function fetchCandles(limit = 300): Promise<Candle[]> {
-  const r = await fetch(`${API}/klines?symbol=${RULES.symbol}&interval=${RULES.interval}&limit=${limit}`, {
-    cache: "no-store",
+export async function fetchCandles(limit = 300, interval: string = RULES.interval): Promise<Candle[]> {
+  const r = await fetch(`${API}/klines?symbol=${RULES.symbol}&interval=${interval}&limit=${limit}`, {
+    // velas diárias/semanais mudam devagar: cache de 10 min
+    ...(interval === RULES.interval ? { cache: "no-store" as const } : { next: { revalidate: 600 } }),
     signal: AbortSignal.timeout(10_000),
   });
   if (!r.ok) throw new Error(`binance ${r.status}`);
@@ -191,10 +192,10 @@ export async function statsFor(from: number, to: number): Promise<Stats | null> 
 }
 
 // ---------------------------------------------------------------- a Leila explica
-const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const usd = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "USD" });
 const pc = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2).replace(".", ",")}%`;
 
-const LEILA = `Você é a Leila, a IA do Fric. Você opera uma carteira SIMULADA de bitcoin (dinheiro de mentira, R$ 10 mil no início) com o preço REAL do par BTC/BRL na Binance, seguindo regras fixas e públicas, e usa isso para ENSINAR quem acompanha.
+const LEILA = `Você é a Leila, a IA do Fric. Você opera uma carteira SIMULADA de bitcoin (dinheiro de mentira, US$ 10 mil no início) com o preço REAL do par BTC/USDT na Binance, tudo em dólar, seguindo regras fixas e públicas, e usa isso para ENSINAR quem acompanha.
 Regras da carteira: compra quando a média móvel de 20 horas está acima da de 50 horas, o preço fecha acima da média de 20 e o RSI está abaixo de 70; usa só o tamanho que arrisca 1% da carteira com stop de 3%; o stop sobe junto (3% abaixo do maior fechamento); vende no stop ou quando a média de 20 cruza para baixo da de 50; taxa de 0,1% por operação; depois de vender espera 6 horas.
 Como escrever:
 - Português do Brasil, tom de professora calma e honesta. Frases curtas. Sem emoji, sem markdown, sem listas.
@@ -203,6 +204,20 @@ Como escrever:
 - Ensine UM conceito por vez (média móvel, RSI, stop, tamanho de posição, regra de 1%, taxa, drawdown, comparar com "comprar e segurar", disciplina de não operar) ligado aos números.
 - Termine com uma dica curta do que observar no próximo acompanhamento.
 - No máximo 550 caracteres.`;
+
+/** Médias de longo prazo (200 dias e 4 anos) para a Leila dar contexto. */
+async function longContext(): Promise<string> {
+  try {
+    const [d, w] = await Promise.all([fetchCandles(400, "1d"), fetchCandles(240, "1w")]);
+    const lv = longLevels(d, w);
+    const px = d[d.length - 1].c;
+    const rel = (v: number) => `${px >= v ? "acima" : "abaixo"} (${pc((px / v - 1) * 100)})`;
+    return `
+Contexto de longo prazo: preço ${usd(px)}; média de 200 dias ${usd(lv.ma200d)}, preço ${rel(lv.ma200d)}; média de 4 anos ${usd(lv.ma4y)}, preço ${rel(lv.ma4y)}. Use isso só se ajudar a ensinar.`;
+  } catch {
+    return "";
+  }
+}
 
 async function ask(prompt: string): Promise<string | null> {
   try {
@@ -219,12 +234,12 @@ function fillPrompt(f: Record<string, any>) {
   const ind = f.ind as Fill["ind"];
   const head =
     f.side === "compra"
-      ? `A carteira simulada acabou de COMPRAR ${f.qty.toFixed(6)} BTC a ${brl(f.price)}. Stop de proteção em ${brl(ind.stop)}.`
-      : `A carteira simulada acabou de VENDER a ${brl(f.price)}. Resultado desta operação: ${brl(f.pnl ?? 0)}.`;
+      ? `A carteira simulada acabou de COMPRAR ${f.qty.toFixed(6)} BTC a ${usd(f.price)}. Stop de proteção em ${usd(ind.stop)}.`
+      : `A carteira simulada acabou de VENDER a ${usd(f.price)}. Resultado desta operação: ${usd(f.pnl ?? 0)}.`;
   return `${head}
 Motivo pela regra: ${REASON_TXT[f.reason as Reason]}
-Média 20h: ${brl(ind.emaF)} | Média 50h: ${brl(ind.emaS)} | RSI: ${ind.rsi.toFixed(0)} | Taxa paga: ${brl(f.fee)}
-Carteira agora: ${brl(f.equity_after)} (começou com ${brl(RULES.startCash)}).
+Média 20h: ${usd(ind.emaF)} | Média 50h: ${usd(ind.emaS)} | RSI: ${ind.rsi.toFixed(0)} | Taxa paga: ${usd(f.fee)}
+Carteira agora: ${usd(f.equity_after)} (começou com ${usd(RULES.startCash)}).
 Explique para um iniciante o que aconteceu e o que isso ensina.`;
 }
 
@@ -237,30 +252,32 @@ const KIND_TXT: Record<Kind, string> = {
 
 function statsPrompt(kind: Kind, st: Stats) {
   return `Fechamento ${KIND_TXT[kind]} da carteira simulada.
-Carteira: ${brl(st.eqStart)} → ${brl(st.eqEnd)} (${pc(st.pct)}).
-Bitcoin no mesmo período: ${brl(st.btcStart)} → ${brl(st.btcEnd)} (${pc(st.btcPct)}).
-Operações: ${st.trades} (${st.buys} compras, ${st.sells} vendas, ${st.wins} vendas com lucro). Resultado realizado: ${brl(st.realized)}. Taxas: ${brl(st.fees)}.
+Carteira: ${usd(st.eqStart)} → ${usd(st.eqEnd)} (${pc(st.pct)}).
+Bitcoin no mesmo período: ${usd(st.btcStart)} → ${usd(st.btcEnd)} (${pc(st.btcPct)}).
+Operações: ${st.trades} (${st.buys} compras, ${st.sells} vendas, ${st.wins} vendas com lucro). Resultado realizado: ${usd(st.realized)}. Taxas: ${usd(st.fees)}.
 Maior queda desde o pico (drawdown): ${pc(st.maxDD)}. Tempo posicionada: ${st.exposure.toFixed(0)}% das horas.
 Faça o resumo do período como aula: compare com o bitcoin e diga o que isso ensina.`;
 }
 
 function fallbackFill(f: Record<string, any>) {
   return f.side === "compra"
-    ? `Compra simulada a ${brl(f.price)}. ${REASON_TXT[f.reason as Reason]} O stop ficou em ${brl(f.ind.stop)}: se o preço tocar ali, a carteira sai. Repare que só entrou com uma parte da carteira, para arriscar no máximo 1%.`
-    : `Venda simulada a ${brl(f.price)}, resultado de ${brl(f.pnl ?? 0)}. ${REASON_TXT[f.reason as Reason]} Sair pela regra, sem discutir com o preço, é o que mantém a perda pequena quando o mercado vira.`;
+    ? `Compra simulada a ${usd(f.price)}. ${REASON_TXT[f.reason as Reason]} O stop ficou em ${usd(f.ind.stop)}: se o preço tocar ali, a carteira sai. Repare que só entrou com uma parte da carteira, para arriscar no máximo 1%.`
+    : `Venda simulada a ${usd(f.price)}, resultado de ${usd(f.pnl ?? 0)}. ${REASON_TXT[f.reason as Reason]} Sair pela regra, sem discutir com o preço, é o que mantém a perda pequena quando o mercado vira.`;
 }
 
 function fallbackStats(kind: Kind, st: Stats) {
-  return `Fechamento ${KIND_TXT[kind]}: a carteira foi de ${brl(st.eqStart)} para ${brl(st.eqEnd)} (${pc(st.pct)}), enquanto o bitcoin fez ${pc(st.btcPct)}. Foram ${st.trades} operações e a maior queda desde o pico foi de ${pc(st.maxDD)}. Compare sempre com o bitcoin parado: é assim que se sabe se a estratégia está ajudando.`;
+  return `Fechamento ${KIND_TXT[kind]}: a carteira foi de ${usd(st.eqStart)} para ${usd(st.eqEnd)} (${pc(st.pct)}), enquanto o bitcoin fez ${pc(st.btcPct)}. Foram ${st.trades} operações e a maior queda desde o pico foi de ${pc(st.maxDD)}. Compare sempre com o bitcoin parado: é assim que se sabe se a estratégia está ajudando.`;
 }
 
 /** Comentários pendentes: operações sem nota e períodos recém-fechados. No máximo 3 chamadas de IA por rodada. */
 async function writeNotes() {
   let budget = 3;
   let written = 0;
+  let ctx: string | null = null;
+  const withCtx = async (p: string) => p + (ctx ??= await longContext());
   const pending = await sql`select * from trade_fills where note is null order by candle_t limit 5`;
   for (const f of pending) {
-    const body = (budget-- > 0 ? await ask(fillPrompt(f)) : null) ?? fallbackFill(f);
+    const body = (budget-- > 0 ? await ask(await withCtx(fillPrompt(f))) : null) ?? fallbackFill(f);
     await sql`update trade_fills set note = ${body} where id = ${f.id}`;
     written++;
   }
@@ -275,7 +292,7 @@ async function writeNotes() {
     if (has) continue;
     const st = await statsFor(Math.max(prev.start, started), prev.end);
     if (!st) continue;
-    const ai = budget-- > 0 ? await ask(statsPrompt(kind, st)) : null;
+    const ai = budget-- > 0 ? await ask(await withCtx(statsPrompt(kind, st))) : null;
     await sql`insert into trade_notes (kind, period_key, starts, ends, stats, body, by_ai)
       values (${kind}, ${prev.key}, ${iso(prev.start)}, ${iso(prev.end)}, ${JSON.stringify(st)}, ${ai ?? fallbackStats(kind, st)}, ${!!ai})
       on conflict (kind, period_key) do nothing`;

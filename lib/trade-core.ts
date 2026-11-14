@@ -1,7 +1,7 @@
 /** Parte pura do Trade BTC (sem banco, sem rede): regras, indicadores, simulação e períodos. */
 // ---------------------------------------------------------------- regras (públicas)
 export const RULES = {
-  symbol: "BTCBRL",
+  symbol: "BTCUSDT",
   interval: "1h",
   startCash: 10_000,
   emaFast: 20,
@@ -130,6 +130,34 @@ export function step(s: SimState, c: Candle, ind: Ind): { s: SimState; fill: Fil
   }
   const mark: Mark = { t: c.t, close: c.c, equity: st.cash + st.btc * c.c, inPos: st.btc > 0, ...ind };
   return { s: st, fill, mark };
+}
+
+/** Média simples dos últimos n fechamentos até o índice i (null se não há histórico suficiente). */
+export function smaAt(cs: Candle[], i: number, n: number): number | null {
+  if (i + 1 < n) return null;
+  let s = 0;
+  for (let k = i - n + 1; k <= i; k++) s += cs[k].c;
+  return s / n;
+}
+
+/** Média de 200 dias (velas diárias) e média de 4 anos (208 velas semanais), no último ponto. */
+export function longLevels(daily: Candle[], weekly: Candle[]) {
+  return {
+    ma200d: smaAt(daily, daily.length - 1, 200) ?? NaN,
+    ma4y: smaAt(weekly, weekly.length - 1, 208) ?? NaN,
+  };
+}
+
+/** Média de 4 anos "andando" dia a dia: para cada vela diária, média das 208 semanas anteriores. */
+export function ma4ySeries(daily: Candle[], weekly: Candle[]): (number | null)[] {
+  return daily.map((d) => {
+    let j = -1;
+    for (let k = weekly.length - 1; k >= 0; k--) if (weekly[k].t <= d.t) { j = k; break; }
+    if (j < 0) return null;
+    // a semana em andamento entra com o fechamento do dia (como no gráfico semanal ao vivo)
+    const ws = weekly.slice(0, j + 1).map((w, k) => (k === j ? { ...w, c: d.c } : w));
+    return smaAt(ws, j, 208);
+  });
 }
 
 export const REASON_TXT: Record<Reason, string> = {

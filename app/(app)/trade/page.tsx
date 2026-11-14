@@ -3,7 +3,7 @@ import { ShieldCheck, Sparkles, ExternalLink, Fingerprint, ListChecks } from "lu
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { sql } from "@/lib/db";
 import {
-  RULES, H, KINDS, REASON_TXT, candleUrl, fetchCandles, fetchPrice, indicators, periodOf, statsFor,
+  RULES, H, KINDS, REASON_TXT, candleUrl, fetchCandles, fetchPrice, indicators, periodOf, statsFor, smaAt, ma4ySeries,
   type Candle, type Kind, type Reason, type Stats,
 } from "@/lib/trade";
 import "./trade.css";
@@ -14,8 +14,8 @@ export const metadata = {
   description: "A Leila, IA do Fric, opera uma carteira simulada de bitcoin com preço real e ensina cada decisão.",
 };
 
-const brl = (n: number, max = 2) =>
-  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: max, minimumFractionDigits: max });
+const usd = (n: number, max = 2) =>
+  n.toLocaleString("pt-BR", { style: "currency", currency: "USD", maximumFractionDigits: max, minimumFractionDigits: max });
 const pc = (n: number) =>
   Math.abs(n) < 0.005 ? "0,00%" : `${n > 0 ? "+" : ""}${n.toFixed(2).replace(".", ",")}%`;
 const tone = (n: number) => (n > 0.005 ? "up" : n < -0.005 ? "down" : "");
@@ -59,14 +59,18 @@ async function loadState() {
   }
 }
 
-export default async function Trade({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
-  const p = (await searchParams).p;
+export default async function Trade({ searchParams }: { searchParams: Promise<{ p?: string; g?: string }> }) {
+  const { p, g } = await searchParams;
   const kind: Kind = (KINDS as string[]).includes(p ?? "") ? (p as Kind) : "12h";
+  const view: View = g === "6m" ? "6m" : "3d";
 
-  const [state, price, candles] = await Promise.all([
+  const none = () => [] as Candle[];
+  const [state, price, candles, daily, weekly] = await Promise.all([
     loadState(),
     fetchPrice(),
-    fetchCandles(130).catch(() => [] as Candle[]),
+    fetchCandles(130).catch(none),
+    fetchCandles(400, "1d").catch(none),
+    fetchCandles(240, "1w").catch(none),
   ]);
   const live = price ?? candles[candles.length - 1]?.c ?? null;
 
@@ -87,7 +91,7 @@ export default async function Trade({ searchParams }: { searchParams: Promise<{ 
       <div className="notice">
         <ShieldCheck aria-hidden />
         <span>
-          Simulação educativa: o preço é real (Binance, BTC/BRL), o dinheiro não. Nada aqui é recomendação de
+          Simulação educativa: o preço é real (Binance, BTC/USDT, em dólar), o dinheiro não. Nada aqui é recomendação de
           investimento. As decisões seguem regras fixas e públicas; a IA só explica.
         </span>
       </div>
@@ -96,17 +100,17 @@ export default async function Trade({ searchParams }: { searchParams: Promise<{ 
         <div className="empty">
           <div className="ic"><Sparkles aria-hidden /></div>
           <h2>A carteira começa na próxima hora</h2>
-          <p>Ela nasce com R$ 10 mil simulados e só opera daqui pra frente, sem olhar o passado.</p>
+          <p>Ela nasce com US$ 10 mil simulados e só opera daqui pra frente, sem olhar o passado.</p>
         </div>
       ) : (
-        <Body state={state} live={live} candles={candles} kind={kind} />
+        <Body state={state} live={live} candles={candles} daily={daily} weekly={weekly} kind={kind} view={view} />
       )}
       <div className="trd-pad" aria-hidden />
     </>
   );
 }
 
-async function Body({ state, live, candles, kind }: { state: Record<string, any>; live: number | null; candles: Candle[]; kind: Kind }) {
+async function Body({ state, live, candles, daily, weekly, kind, view }: { state: Record<string, any>; live: number | null; candles: Candle[]; daily: Candle[]; weekly: Candle[]; kind: Kind; view: View }) {
   const now = Date.now();
   const started = new Date(state.started_at).getTime();
   const period = periodOf(kind, now);
@@ -150,12 +154,12 @@ async function Body({ state, live, candles, kind }: { state: Record<string, any>
       <section className="trd-kpis">
         <div className="trd-kpi">
           <small>Bitcoin agora</small>
-          <b>{live ? brl(live, 0) : "—"}</b>
+          <b>{live ? usd(live, 0) : "—"}</b>
           <span className={tone(hold)}>{pc(hold)} desde o início</span>
         </div>
         <div className="trd-kpi">
           <small>Carteira simulada</small>
-          <b>{brl(equity)}</b>
+          <b>{usd(equity)}</b>
           <span className={tone(total)}>{pc(total)} desde o início</span>
         </div>
         <div className="trd-kpi">
@@ -164,14 +168,14 @@ async function Body({ state, live, candles, kind }: { state: Record<string, any>
             <>
               <b>{state.btc.toFixed(5)} BTC</b>
               <span>
-                Compra {brl(state.entry, 0)} · stop {brl(state.stop, 0)}
+                Compra {usd(state.entry, 0)} · stop {usd(state.stop, 0)}
                 <br />
-                <em className={tone(open)}>{open >= 0 ? "+" : ""}{brl(open)} em aberto</em>
+                <em className={tone(open)}>{open >= 0 ? "+" : ""}{usd(open)} em aberto</em>
               </span>
             </>
           ) : (
             <>
-              <b>100% em reais</b>
+              <b>100% em dólar</b>
               <span>{state.cooldown > 0 ? `Esperando ${state.cooldown}h depois da última venda` : "Esperando o sinal das regras"}</span>
             </>
           )}
@@ -183,13 +187,13 @@ async function Body({ state, live, candles, kind }: { state: Record<string, any>
         </div>
       </section>
 
-      {candles.length > 60 && <Chart candles={candles} fills={fills} />}
+      {candles.length > 60 && <Chart view={view} kind={kind} candles={candles} daily={daily} weekly={weekly} fills={fills} />}
 
       <section className="trd-card">
         <h2 className="trd-h"><ListChecks aria-hidden /> Plano de acompanhamento</h2>
         <nav className="tabs trd-tabs" aria-label="Período">
           {KINDS.map((k) => (
-            <Link key={k} href={k === "12h" ? "/trade" : `/trade?p=${k}`} aria-current={k === kind ? "page" : undefined} scroll={false}>
+            <Link key={k} href={qs(k, view)} aria-current={k === kind ? "page" : undefined} scroll={false}>
               <span>{KIND_LABEL[k]}</span>
             </Link>
           ))}
@@ -224,8 +228,8 @@ async function Body({ state, live, candles, kind }: { state: Record<string, any>
               <li key={f.id} className={f.side === "compra" ? "buy" : "sell"}>
                 <div className="trd-fhead">
                   <span className={`pill ${f.side === "compra" ? "mint" : "rose"}`}>{f.side === "compra" ? "Compra" : "Venda"}</span>
-                  <b>{brl(f.price, 0)}</b>
-                  {f.pnl != null && <em className={tone(f.pnl)}>{f.pnl >= 0 ? "+" : ""}{brl(f.pnl)}</em>}
+                  <b>{usd(f.price, 0)}</b>
+                  {f.pnl != null && <em className={tone(f.pnl)}>{f.pnl >= 0 ? "+" : ""}{usd(f.pnl)}</em>}
                   <time>{when(new Date(f.candle_t).getTime() + H)}</time>
                 </div>
                 <p className="trd-why">{REASON_TXT[f.reason as Reason]}</p>
@@ -247,7 +251,7 @@ async function Body({ state, live, candles, kind }: { state: Record<string, any>
       <section className="trd-card">
         <h2 className="trd-h"><ShieldCheck aria-hidden /> As regras (sempre as mesmas)</h2>
         <ul className="trd-rules">
-          <li>Preço real do par BTC/BRL na Binance, em velas de 1 hora. A decisão sai quando a vela fecha.</li>
+          <li>Preço real do par BTC/USDT na Binance (dólar), em velas de 1 hora. A decisão sai quando a vela fecha.</li>
           <li><b>Compra</b> quando a média das últimas 20h está acima da média de 50h, o preço fecha acima da média de 20h e o RSI está abaixo de 70 (não compra no exagero).</li>
           <li><b>Tamanho</b>: entra só com o valor que, se cair 3%, perde no máximo 1% da carteira (cerca de um terço dela).</li>
           <li><b>Stop móvel</b>: 3% abaixo do maior fechamento desde a compra. Ele só sobe, nunca desce.</li>
@@ -280,66 +284,180 @@ function StatsGrid({ title, st }: { title: string; st: Stats }) {
         <div><dt>Operações</dt><dd>{st.trades}</dd></div>
         <div><dt>Vendas com lucro</dt><dd>{st.sells ? `${st.wins} de ${st.sells}` : "—"}</dd></div>
         <div><dt>Maior queda</dt><dd className={tone(st.maxDD)}>{pc(st.maxDD)}</dd></div>
-        <div><dt>Taxas pagas</dt><dd>{brl(st.fees)}</dd></div>
+        <div><dt>Taxas pagas</dt><dd>{usd(st.fees)}</dd></div>
         <div><dt>Tempo comprada</dt><dd>{st.hours ? `${st.exposure.toFixed(0)}%` : "—"}</dd></div>
       </dl>
     </div>
   );
 }
 
-/** Gráfico das últimas 72h: preço, média de 20h, média de 50h e as operações. SVG puro. */
-function Chart({ candles, fills }: { candles: Candle[]; fills: Record<string, any>[] }) {
-  const ind = indicators(candles);
-  const N = 72;
-  const cs = candles.slice(-N);
-  const is = ind.slice(-N);
+type View = "3d" | "6m";
+
+const qs = (k: Kind, v: View) => {
+  const q = new URLSearchParams();
+  if (k !== "12h") q.set("p", k);
+  if (v !== "3d") q.set("g", v);
+  const s = q.toString();
+  return s ? `/trade?${s}` : "/trade";
+};
+
+const kUsd = (v: number, dec = 1) => `${(v / 1000).toFixed(dec).replace(".", ",")} mil`;
+const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+type Line = { v: (number | null)[]; cls: string };
+type Level = { v: number; cls: string; label: string };
+
+/**
+ * Gráfico de candles em SVG puro.
+ *  3d: 72 velas de 1h + médias de 20h e 50h (as da estratégia); 200 dias e 4 anos entram como níveis.
+ *  6m: 180 velas diárias + média de 200 dias e média de 4 anos andando dia a dia.
+ */
+function Chart({ view, kind, candles, daily, weekly, fills }: {
+  view: View; kind: Kind; candles: Candle[]; daily: Candle[]; weekly: Candle[]; fills: Record<string, any>[];
+}) {
+  const ma200 = daily.map((_, i) => smaAt(daily, i, 200));
+  const ma4 = ma4ySeries(daily, weekly);
+  const last200 = ma200[ma200.length - 1] ?? null;
+  const last4 = ma4[ma4.length - 1] ?? null;
+
+  let cs: Candle[];
+  let lines: Line[];
+  let levels: Level[] = [];
+  let step: number;
+  if (view === "3d") {
+    const ind = indicators(candles);
+    cs = candles.slice(-72);
+    const is = ind.slice(-72);
+    lines = [{ v: is.map((i) => i.emaS), cls: "ema-s" }, { v: is.map((i) => i.emaF), cls: "ema-f" }];
+    if (last200) levels.push({ v: last200, cls: "ma200", label: "200 dias" });
+    if (last4) levels.push({ v: last4, cls: "ma4y", label: "4 anos" });
+    step = H;
+  } else {
+    const n = 180;
+    cs = daily.slice(-n);
+    lines = [{ v: ma4.slice(-n), cls: "ma4y" }, { v: ma200.slice(-n), cls: "ma200" }];
+    step = 24 * H;
+  }
+  if (cs.length < 2) return null;
+
   const W = 600;
-  const Ht = 220;
-  const pad = { l: 6, r: 64, t: 12, b: 22 };
-  const vals = [...cs.flatMap((c) => [c.h, c.l]), ...is.flatMap((i) => [i.emaF, i.emaS])];
-  const lo = Math.min(...vals);
-  const hi = Math.max(...vals);
-  const x = (i: number) => pad.l + (i / (cs.length - 1)) * (W - pad.l - pad.r);
-  const y = (v: number) => pad.t + (1 - (v - lo) / (hi - lo || 1)) * (Ht - pad.t - pad.b);
-  const line = (vs: number[]) => vs.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+  const Ht = 240;
+  const pad = { l: 6, r: 66, t: 12, b: 22 };
+  const vals = [...cs.flatMap((c) => [c.h, c.l]), ...lines.flatMap((l) => l.v.filter((x): x is number => x != null))];
+  let lo = Math.min(...vals);
+  let hi = Math.max(...vals);
+  // nível perto do gráfico entra na escala; longe demais vira aviso embaixo (senão achata os candles)
+  const span0 = hi - lo;
+  const off: (Level & { side: "acima" | "abaixo" })[] = [];
+  levels = levels.filter((l) => {
+    if (l.v >= lo - span0 * 0.35 && l.v <= hi + span0 * 0.35) {
+      lo = Math.min(lo, l.v);
+      hi = Math.max(hi, l.v);
+      return true;
+    }
+    off.push({ ...l, side: l.v > hi ? "acima" : "abaixo" });
+    return false;
+  });
+  const span = hi - lo || 1;
+  lo -= span * 0.03;
+  hi += span * 0.03;
+
+  const slot = (W - pad.l - pad.r) / cs.length;
+  const cx = (i: number) => pad.l + (i + 0.5) * slot;
+  const y = (v: number) => pad.t + (1 - (v - lo) / (hi - lo)) * (Ht - pad.t - pad.b);
+  const path = (vs: (number | null)[]) => {
+    let d = "";
+    let pen = false;
+    vs.forEach((v, i) => {
+      if (v == null) return void (pen = false);
+      d += `${pen ? "L" : "M"}${cx(i).toFixed(1)},${y(v).toFixed(1)}`;
+      pen = true;
+    });
+    return d;
+  };
+  const bw = Math.max(1, slot * 0.64);
   const t0 = cs[0].t;
   const marks = fills
-    .map((f) => ({ f, i: Math.round((new Date(f.candle_t).getTime() - t0) / H) }))
+    .map((f) => ({ f, i: Math.floor((new Date(f.candle_t).getTime() - t0) / step) }))
     .filter(({ i }) => i >= 0 && i < cs.length);
-  const last = cs[cs.length - 1];
-  const ticks = [hi, (hi + lo) / 2, lo];
-  const days = cs.map((c, i) => ({ c, i })).filter(({ c }) => new Date(c.t - 3 * H).getUTCHours() === 0);
+  const ticks = [hi - (hi - lo) * 0.05, (hi + lo) / 2, lo + (hi - lo) * 0.05];
+  const xlabels = cs
+    .map((c, i) => ({ c, i, d: new Date(c.t - 3 * H) }))
+    .filter(({ d, i }) => (view === "3d" ? d.getUTCHours() === 0 : d.getUTCDate() === 1 && i > 2))
+    .map(({ c, i, d }) => ({
+      key: c.t,
+      x: cx(i),
+      txt: view === "3d" ? `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}` : MESES[d.getUTCMonth()],
+    }));
+  const px = cs[cs.length - 1].c;
+  const rel = (v: number) => `preço ${pc((px / v - 1) * 100)}`;
 
   return (
     <section className="trd-card trd-chart">
+      <nav className="trd-seg" aria-label="Período do gráfico">
+        <Link href={qs(kind, "3d")} aria-current={view === "3d" ? "page" : undefined} scroll={false}>3 dias · velas de 1h</Link>
+        <Link href={qs(kind, "6m")} aria-current={view === "6m" ? "page" : undefined} scroll={false}>6 meses · velas diárias</Link>
+      </nav>
       <div className="trd-legend">
-        <span><i className="p" /> Preço</span>
-        <span><i className="f" /> Média 20h</span>
-        <span><i className="s" /> Média 50h</span>
-        <span><i className="b" /> Compra</span>
-        <span><i className="v" /> Venda</span>
-        <small>Últimas 72h</small>
+        <span><i className="cu" /><i className="cd" /> Candles</span>
+        {view === "3d" && (
+          <>
+            <span><i className="f" /> Média 20h</span>
+            <span><i className="s" /> Média 50h</span>
+          </>
+        )}
+        <span><i className="m200" /> Média 200 dias</span>
+        <span><i className="m4y" /> Média 4 anos</span>
+        {view === "3d" && <span><i className="b" /> Compra <i className="v" /> Venda</span>}
       </div>
-      <svg viewBox={`0 0 ${W} ${Ht}`} role="img" aria-label="Gráfico do preço do bitcoin nas últimas 72 horas com médias e operações">
+      <svg viewBox={`0 0 ${W} ${Ht}`} role="img" aria-label={`Gráfico de candles do bitcoin em dólar, ${view === "3d" ? "últimas 72 horas" : "últimos 6 meses"}, com médias móveis`}>
         {ticks.map((v) => (
           <g key={v}>
             <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} className="grid" />
-            <text x={W - pad.r + 6} y={y(v) + 4} className="tick">{Math.round(v / 1000)} mil</text>
+            <text x={W - pad.r + 6} y={y(v) + 4} className="tick">{kUsd(v)}</text>
           </g>
         ))}
-        {days.map(({ c, i }) => (
-          <text key={c.t} x={x(i)} y={Ht - 6} className="tick" textAnchor="middle">
-            {new Date(c.t - 3 * H).toISOString().slice(8, 10)}/{new Date(c.t - 3 * H).toISOString().slice(5, 7)}
-          </text>
+        {xlabels.map((l) => (
+          <text key={l.key} x={l.x} y={Ht - 6} className="tick" textAnchor="middle">{l.txt}</text>
         ))}
-        <path d={line(is.map((i) => i.emaS))} className="ema-s" />
-        <path d={line(is.map((i) => i.emaF))} className="ema-f" />
-        <path d={line(cs.map((c) => c.c))} className="price" />
-        {marks.map(({ f, i }) => (
-          <circle key={f.id} cx={x(i)} cy={y(f.price)} r={5.5} className={f.side === "compra" ? "buy" : "sell"} />
+        {levels.map((l) => (
+          <g key={l.cls}>
+            <line x1={pad.l} x2={W - pad.r} y1={y(l.v)} y2={y(l.v)} className={`lvl ${l.cls}`} />
+            <text x={W - pad.r + 6} y={y(l.v) + 4} className={`lvl-t ${l.cls}`}>{l.label}</text>
+          </g>
         ))}
-        <circle cx={x(cs.length - 1)} cy={y(last.c)} r={3.5} className="now" />
+        {cs.map((c, i) => {
+          const up = c.c >= c.o;
+          const top = y(Math.max(c.o, c.c));
+          return (
+            <g key={c.t} className={up ? "cu" : "cd"}>
+              <line x1={cx(i)} x2={cx(i)} y1={y(c.h)} y2={y(c.l)} />
+              <rect x={cx(i) - bw / 2} y={top} width={bw} height={Math.max(1, y(Math.min(c.o, c.c)) - top)} rx={bw > 4 ? 1 : 0} />
+            </g>
+          );
+        })}
+        {lines.map((l) => <path key={l.cls} d={path(l.v)} className={l.cls} />)}
+        {marks.map(({ f, i }) =>
+          f.side === "compra" ? (
+            <path key={f.id} className="buy" d={`M${cx(i)},${y(f.price) + 6}l-6,10h12z`} />
+          ) : (
+            <path key={f.id} className="sell" d={`M${cx(i)},${y(f.price) - 6}l-6,-10h12z`} />
+          ),
+        )}
       </svg>
+      <div className="trd-levels">
+        {last200 != null && (
+          <span><i className="m200" /> Média 200 dias <b>{usd(last200, 0)}</b> · {rel(last200)}{off.some((o) => o.cls === "ma200") ? ` (${off.find((o) => o.cls === "ma200")!.side} do gráfico)` : ""}</span>
+        )}
+        {last4 != null && (
+          <span><i className="m4y" /> Média 4 anos <b>{usd(last4, 0)}</b> · {rel(last4)}{off.some((o) => o.cls === "ma4y") ? ` (${off.find((o) => o.cls === "ma4y")!.side} do gráfico)` : ""}</span>
+        )}
+      </div>
+      <p className="trd-explain">
+        A média de 200 dias é a linha clássica que o mercado usa para separar tendência de alta e de baixa no longo
+        prazo. A de 4 anos cobre um ciclo inteiro do bitcoin (de um halving ao outro). Elas dão contexto; quem decide
+        as operações continuam sendo as médias de 20h e 50h.
+      </p>
     </section>
   );
 }
