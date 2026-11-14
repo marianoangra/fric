@@ -26,7 +26,11 @@ export const LOTE = {
   color: "#3DDBB0",
   // vídeo da Leila apresentando o lote (feito pela IA de vídeo). null = página mostra só o avatar.
   // src: mp4 no Vercel Blob (lotes/<slug>.mp4) · poster: 1º quadro (jpg) · vtt: legenda PT (opcional)
-  video: null as { src: string; poster?: string; vtt?: string } | null,
+  video: {
+    src: "https://ujvyhqfjbm7xbxo4.public.blob.vercel-storage.com/lotes/guirlanda-v1.mp4",
+    poster: "/lotes/guirlanda.jpg",
+    vtt: "/lotes/guirlanda.pt.vtt",
+  } as { src: string; poster?: string; vtt?: string } | null,
 };
 
 function LeilaVideo({ v }: { v: NonNullable<typeof LOTE.video> }) {

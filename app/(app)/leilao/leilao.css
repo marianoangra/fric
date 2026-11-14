@@ -158,8 +158,8 @@
 }
 
 /* vídeo da Leila (9:16), em cima do palco */
-.lr-video { position: relative; background: #000; display: grid; place-items: center }
-.lr-video video { display: block; width: 100%; max-height: min(50svh, 560px); aspect-ratio: 9 / 16; object-fit: contain; background: #000 }
+.lr-video { position: relative; background: #090a15; display: grid; place-items: center }
+.lr-video video { display: block; width: 100%; max-height: min(50svh, 560px); aspect-ratio: 9 / 16; object-fit: contain; background: #090a15 }
 .lr-video video::cue { font: 600 15px/1.35 var(--body); background: rgba(0, 0, 0, .72) }
 .lr-video-tag {
   position: absolute; top: 10px; left: 10px; padding: 5px 9px; border-radius: 99px;
