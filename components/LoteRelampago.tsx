@@ -7,7 +7,7 @@
  * O único relógio é a contagem real até o Natal.
  */
 import { useEffect, useRef, useState } from "react";
-import { ExternalLink, Gift, SendHorizonal, Truck, ShieldCheck } from "lucide-react";
+import { ExternalLink, Gift, SendHorizonal, Truck, ShieldCheck, Volume2, VolumeX } from "lucide-react";
 import { Avatar, IA } from "./ui";
 import { coverBg } from "@/lib/format";
 
@@ -24,7 +24,41 @@ export const LOTE = {
   href: "https://meli.la/34jd969",
   img: null as string | null, // foto do produto, quando houver (public/lotes/...)
   color: "#3DDBB0",
+  // vídeo da Leila apresentando o lote (feito pela IA de vídeo). null = página mostra só o avatar.
+  // src: mp4 no Vercel Blob (lotes/<slug>.mp4) · poster: 1º quadro (jpg) · vtt: legenda PT (opcional)
+  video: null as { src: string; poster?: string; vtt?: string } | null,
 };
+
+function LeilaVideo({ v }: { v: NonNullable<typeof LOTE.video> }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+  return (
+    <div className="lr-video">
+      {/* autoplay só funciona mudo; a legenda carrega a mensagem até a pessoa ligar o som */}
+      <video ref={ref} src={v.src} poster={v.poster} autoPlay muted={muted} loop playsInline preload="metadata">
+        {v.vtt && <track kind="subtitles" src={v.vtt} srcLang="pt-BR" label="Português" default />}
+      </video>
+      <span className="lr-video-tag">Vídeo gerado por IA</span>
+      <button
+        type="button"
+        className="lr-video-sound"
+        onClick={() => {
+          const el = ref.current;
+          if (!el) return;
+          const next = !muted;
+          setMuted(next);
+          el.muted = next;
+          if (!next) {
+            el.currentTime = 0;
+            el.play().catch(() => {});
+          }
+        }}
+      >
+        {muted ? <><Volume2 size={16} aria-hidden /> Ouvir a Leila</> : <><VolumeX size={16} aria-hidden /> Sem som</>}
+      </button>
+    </div>
+  );
+}
 
 // falas de abertura já prontas: aparecem na hora, sem esperar a rig
 const INTRO = [
@@ -142,6 +176,7 @@ export function LoteRelampago() {
   return (
     <>
       <section className="lei-stage" aria-label="Lote relâmpago">
+        {LOTE.video && <LeilaVideo v={LOTE.video} />}
         <div className="lei-host">
           <div className={`lei-face${busy ? " on" : ""}`}>
             <Avatar name={HOST.name} color={HOST.color} src={HOST.src} size={92} ring live={status === "online"} eager />
