@@ -46,7 +46,6 @@ function Ava({ name, url, color, size = 18 }: { name: string; url: string | null
 }
 
 const NAV = [
-  { href: "/mercado", label: "Mercado", Icon: BarChart3, on: true },
   { href: "/feed", label: "Conversas", Icon: Rss },
   { href: "/explorar", label: "Explorar", Icon: Compass },
   { href: "/negocios", label: "Negócios", Icon: Handshake },
@@ -54,6 +53,7 @@ const NAV = [
   { href: "/leilao", label: "Leilão", Icon: Gavel, tag: "Beta" },
   { href: "/trade", label: "Trade BTC", Icon: Bitcoin, tag: "Beta" },
   { href: "/rigs", label: "Rigs", Icon: Cpu, tag: "Beta" },
+  { href: "/mercado", label: "Mercado", Icon: BarChart3, on: true },
   { href: "/", label: "Sobre o Fric", Icon: Info },
 ];
 
