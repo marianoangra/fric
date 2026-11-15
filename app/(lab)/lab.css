@@ -1,0 +1,123 @@
+/* Mercado das IAs — visual de painel de dados. Tudo prefixado com yl- pra não colidir com globals.css. */
+.yl {
+  --yl-bg: #0b0d12;
+  --yl-side: #0e1016;
+  --yl-card: #11141b;
+  --yl-line: rgba(255, 255, 255, 0.09);
+  --yl-line-2: rgba(255, 255, 255, 0.14);
+  --yl-text: #f1f3f7;
+  --yl-dim: #8b93a3;
+  --yl-brand: #6b75ff;
+  --yl-up: #3ddbb0;
+  --yl-hot: #ff6b7a;
+  --yl-sun: #ffc857;
+  min-height: 100dvh;
+  background: radial-gradient(1200px 500px at 70% -10%, rgba(107, 117, 255, 0.09), transparent 60%), var(--yl-bg);
+  color: var(--yl-text);
+  font-family: var(--yl-sans), ui-sans-serif, system-ui, sans-serif;
+  color-scheme: dark;
+}
+.yl a { color: inherit; text-decoration: none }
+.yl-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100dvh }
+
+/* sidebar */
+.yl-side { position: sticky; top: 0; height: 100dvh; overflow: auto; background: var(--yl-side); border-right: 1px solid var(--yl-line); padding: 14px 10px; display: flex; flex-direction: column }
+.yl-brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px 18px }
+.yl-mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--yl-brand); font-weight: 800; font-size: 18px; box-shadow: 0 0 0 3px rgba(107, 117, 255, 0.18) }
+.yl-brand b { display: block; font-size: 16px; font-weight: 700; letter-spacing: -0.01em }
+.yl-brand small { display: block; font-size: 12.5px; color: var(--yl-dim) }
+.yl-navh { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--yl-dim); padding: 6px 8px 8px }
+.yl-nav { display: flex; flex-direction: column; gap: 2px }
+.yl-nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; font-size: 14.5px; color: #d9dde6; border: 1px solid transparent }
+.yl-nav a:hover { background: rgba(255, 255, 255, 0.04) }
+.yl-nav a[aria-current] { background: rgba(107, 117, 255, 0.12); border-color: rgba(107, 117, 255, 0.35); color: #fff }
+.yl-nav a[aria-current] svg { color: var(--yl-brand) }
+.yl-nav span { flex: 1 }
+.yl-nav em { font-style: normal; font-family: var(--yl-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--yl-sun); border: 1px solid rgba(255, 200, 87, 0.4); background: rgba(255, 200, 87, 0.08); border-radius: 999px; padding: 1px 7px }
+.yl-create { margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 8px; background: var(--yl-brand); font-weight: 600; font-size: 14px }
+
+/* main */
+.yl-main { padding: 14px 34px 60px; min-width: 0 }
+.yl-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px }
+.yl-dim { color: var(--yl-dim) }
+.yl-signin { display: inline-flex; align-items: center; gap: 8px; background: var(--yl-brand); color: #fff; font-weight: 600; font-size: 14.5px; padding: 7px 14px; border-radius: 6px }
+.yl-hero { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 22px }
+.yl-hero h1 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; letter-spacing: -0.035em; margin: 0 0 8px; line-height: 1.05 }
+.yl-hero p { margin: 0; color: #b7bdc9; font-size: 15.5px }
+.yl-live { display: inline-flex; align-items: center; gap: 6px; font-family: var(--yl-mono); font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; color: var(--yl-up); border: 1px solid rgba(61, 219, 176, 0.45); background: rgba(61, 219, 176, 0.07); padding: 5px 10px; border-radius: 6px; white-space: nowrap }
+.yl-live i { width: 6px; height: 6px; border-radius: 50%; background: var(--yl-up); animation: yl-pulse 1.6s infinite }
+@keyframes yl-pulse { 50% { opacity: 0.3 } }
+
+.yl-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--yl-line); border-radius: 10px; margin-bottom: 18px; background: var(--yl-card) }
+.yl-strip > div { padding: 12px 16px; border-left: 1px solid var(--yl-line); display: flex; flex-direction: column; gap: 2px }
+.yl-strip > div:first-child { border-left: 0 }
+.yl-strip small { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yl-dim) }
+.yl-strip b { font-family: var(--yl-mono); font-size: 22px; font-weight: 500 }
+.yl-strip span { font-size: 12px; color: var(--yl-dim) }
+
+.yl-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 40px }
+.yl-card { background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent), var(--yl-card); border: 1px solid var(--yl-line-2); border-radius: 12px; padding: 18px 18px 12px }
+.yl-card h2 { margin: 0 0 14px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #c9ced8 }
+.yl-card ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px }
+.yl-card li { display: flex; align-items: center; gap: 8px; height: 32px; font-size: 14.5px; font-weight: 600 }
+.yl-card .n { font-family: var(--yl-mono); font-size: 10px; color: var(--yl-dim); width: 16px }
+.yl-card .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.yl-card .v { font-family: var(--yl-mono); font-size: 14px; font-weight: 500; white-space: nowrap }
+.yl-ava { flex: none; border-radius: 50%; object-fit: cover; display: inline-grid; place-items: center; font-size: 10px; font-weight: 700; color: #0b0d12; background: #333 }
+.up { color: var(--yl-up) }
+.hot { color: var(--yl-hot) }
+.sun { color: var(--yl-sun) }
+.yl-empty { color: var(--yl-dim); font-weight: 400 !important; font-size: 13px !important; text-align: center; padding: 18px !important }
+
+.yl-search { display: flex; align-items: center; gap: 10px; border: 1px solid var(--yl-line-2); border-radius: 8px; padding: 0 14px; background: rgba(255, 255, 255, 0.015); color: var(--yl-dim); margin-bottom: 14px }
+.yl-search input { flex: 1; height: 40px; background: none; border: 0; outline: 0; color: var(--yl-text); font: inherit; font-size: 15px }
+.yl-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px }
+.yl-chip { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 13px; border: 1px solid var(--yl-line-2); border-radius: 6px; font-size: 14.5px; font-weight: 500; background: rgba(255, 255, 255, 0.015) }
+.yl-chip.on { color: #c6caff; border-color: rgba(107, 117, 255, 0.55); background: rgba(107, 117, 255, 0.12) }
+.yl-chip.ghost { border-color: transparent; background: none; color: #c9ced8 }
+
+.yl-table { border: 1px solid var(--yl-line-2); border-radius: 14px; background: var(--yl-card); padding: 20px 0 6px }
+.yl-tablehead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 0 24px 18px }
+.yl-tablehead h2 { margin: 0 0 6px; font-size: 17px; font-weight: 700 }
+.yl-tablehead p { margin: 0; font-size: 13px; color: #aab1be }
+.yl-tablehead p a { color: var(--yl-brand); font-weight: 600 }
+.yl-win { display: flex; align-items: center; gap: 10px }
+.yl-win small { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #aab1be }
+.yl-win span { display: flex; border: 1px solid var(--yl-line-2); border-radius: 6px; padding: 3px }
+.yl-win a { font-family: var(--yl-mono); font-size: 12.5px; padding: 5px 10px; border-radius: 4px; color: #aab1be }
+.yl-win a.on { background: rgba(107, 117, 255, 0.16); color: #c6caff }
+.yl-scroll { overflow-x: auto }
+.yl table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 900px }
+.yl th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #aab1be; padding: 10px 12px; border-bottom: 1px solid var(--yl-line); white-space: nowrap }
+.yl th a.on { color: var(--yl-text) }
+.yl td { padding: 0 12px; height: 46px; border-bottom: 1px solid var(--yl-line); white-space: nowrap }
+.yl th:first-child, .yl td:first-child { padding-left: 24px }
+.yl th:last-child, .yl td:last-child { padding-right: 24px }
+.yl tbody tr:hover { background: rgba(255, 255, 255, 0.025) }
+.yl .num { text-align: right; font-family: var(--yl-mono); font-variant-numeric: tabular-nums }
+.yl td.dim { color: #aab1be }
+.yl-ia { display: flex; align-items: center; gap: 10px; font-weight: 600 }
+.yl-ia a { text-decoration: underline dotted rgba(255, 255, 255, 0.35); text-underline-offset: 4px }
+.yl td.sells { max-width: 190px; overflow: hidden; text-overflow: ellipsis; color: #c9ced8 }
+.yl-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--yl-sun); border: 1px solid rgba(255, 200, 87, 0.4); border-radius: 999px; padding: 1px 7px }
+.yl-kind { font-size: 12.5px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--yl-line-2) }
+.yl-kind.real { color: var(--yl-up); border-color: rgba(61, 219, 176, 0.4); background: rgba(61, 219, 176, 0.07) }
+.yl-kind.demo { color: #aab1be }
+.yl-bar { display: block; width: 70px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden }
+.yl-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--yl-brand), var(--yl-up)) }
+
+@media (max-width: 1200px) { .yl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+@media (max-width: 860px) {
+  .yl-shell { grid-template-columns: 1fr }
+  .yl-side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 16px }
+  .yl-navh, .yl-nav, .yl-create { display: none }
+  .yl-brand { padding: 0 }
+  .yl-main { padding: 12px 16px 40px }
+  .yl-top { display: none }
+  .yl-strip { grid-template-columns: repeat(2, 1fr) }
+  .yl-strip > div:nth-child(3) { border-left: 0 }
+  .yl-strip > div:nth-child(n+3) { border-top: 1px solid var(--yl-line) }
+  .yl-cards { grid-template-columns: 1fr }
+  .yl-hero { flex-direction: column }
+  .yl-tablehead { flex-direction: column; padding: 0 16px 14px }
+}
