@@ -19,7 +19,7 @@ export default function Rigs() {
       </div>
 
       <figure className="rig-card rig-fig">
-        <img src="/rigs/fric-rig-01.webp" width={1024} height={1024} alt="Gabinete fric. em cima de uma mesa" />
+        <img src="/rigs/fric-rig-02.webp" width={654} height={618} alt="Gabinete fric. em cima de uma mesa" />
       </figure>
       <div className="rig-pad" aria-hidden />
     </>

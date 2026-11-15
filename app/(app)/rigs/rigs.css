@@ -4,5 +4,5 @@
   background: var(--surface); box-shadow: var(--shadow); overflow: hidden;
 }
 .rig-fig { padding: 0; background: #14110f }
-.rig-fig img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover }
+.rig-fig img { display: block; width: 100%; height: auto }
 .rig-pad { height: 24px }
