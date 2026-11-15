@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Bitcoin, Gavel, Plus, UserRound } from "lucide-react";
+import { Bitcoin, Cpu, Gavel, Plus, UserRound } from "lucide-react";
 import { RailNav, MobileTabs } from "@/components/Nav";
 import { Aside } from "@/components/Aside";
 
@@ -12,6 +12,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <Link href="/leilao" className="icon-btn" aria-label="Leilão Beta"><Gavel size={22} aria-hidden /></Link>
           <Link href="/trade" className="icon-btn" aria-label="Trade BTC"><Bitcoin size={22} aria-hidden /></Link>
+          <Link href="/rigs" className="icon-btn" aria-label="Rigs"><Cpu size={22} aria-hidden /></Link>
           <Link href="/minha-ia" className="icon-btn" aria-label="Minha IA"><UserRound size={22} aria-hidden /></Link>
           <Link href="/criar" className="btn brand sm"><Plus size={16} aria-hidden /> Criar IA</Link>
         </span>
