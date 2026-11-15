@@ -1,0 +1,47 @@
+/* /mercado — usa só os tokens do globals.css; classes com prefixo mk- pra não colidir. */
+.mk-stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 14px 8px; border-bottom: 1px solid var(--line) }
+.mk-stats div { text-align: center; padding: 4px }
+.mk-stats b { display: block; font: 800 22px/1.1 var(--display) }
+.mk-stats small { color: var(--muted); font-size: 12px }
+
+.mk-boards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; border-bottom: 1px solid var(--line) }
+.mk-board { border: 1px solid var(--line); border-radius: var(--r); padding: 14px; background: var(--surface); min-width: 0 }
+.mk-board h2 { font: 800 16px/1.2 var(--display); margin: 0 0 10px }
+.mk-board ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.mk-board li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; font-size: 14px }
+.mk-board li > a, .mk-pair { display: flex; align-items: center; gap: 8px; min-width: 0 }
+.mk-board li b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.mk-board li > a:hover b { text-decoration: underline }
+.mk-pair .avatar + .avatar { margin-left: -14px; box-shadow: 0 0 0 2px var(--surface) }
+.mk-v { flex: none; color: var(--muted); font-size: 13px; font-weight: 600 }
+.mk-board .pill { flex: none }
+
+.mk-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; align-items: center }
+.mk-f { font-weight: 600; font-size: 13.5px; padding: 6px 12px; border-radius: 999px; background: var(--surface-2); color: var(--muted) }
+.mk-f:hover { background: var(--surface-3) }
+.mk-f.on { background: var(--brand-soft); color: var(--brand) }
+.mk-sep { width: 1px; height: 20px; background: var(--line-2); margin: 0 4px }
+
+.mk-scroll { overflow-x: auto; margin: 0 -16px }
+.mk-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px }
+.mk-table th { text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); padding: 10px 8px; border-bottom: 1px solid var(--line) }
+.mk-table td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle }
+.mk-table th:first-child, .mk-table td:first-child { padding-left: 16px }
+.mk-table th:last-child, .mk-table td:last-child { padding-right: 16px }
+.mk-table tbody tr:hover { background: var(--surface-2) }
+.mk-table .n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
+.mk-table td.n.on { font-weight: 800; color: var(--brand) }
+.mk-pos { color: var(--faint); font-weight: 700; width: 24px }
+.mk-ia { display: flex; align-items: center; gap: 10px; min-width: 0 }
+.mk-ia > span { min-width: 0; display: block }
+.mk-ia b { font-weight: 700 }
+.mk-ia .chip { margin-left: 6px; font-style: normal; vertical-align: 1px }
+.mk-ia small { display: block; color: var(--muted); font-size: 12.5px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.mk-ia:hover b { text-decoration: underline }
+.mk-bar { display: block; width: 90px; height: 4px; border-radius: 3px; background: var(--surface-3); margin-top: 5px; overflow: hidden }
+.mk-bar i { display: block; height: 100%; background: var(--brand); border-radius: 3px }
+
+@media (max-width: 640px) {
+  .mk-boards { grid-template-columns: 1fr }
+  .mk-stats b { font-size: 19px }
+}
