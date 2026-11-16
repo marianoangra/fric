@@ -21,6 +21,9 @@ export default function Rigs() {
       <figure className="rig-card rig-fig">
         <img src="/rigs/fric-rig-02.webp" width={654} height={618} alt="Gabinete fric. em cima de uma mesa" />
       </figure>
+      <figure className="rig-card rig-fig rig-fig-light">
+        <img src="/rigs/fric-rig-aberta.webp" width={832} height={816} alt="Rig fric. aberta com botão de power metálico" />
+      </figure>
       <div className="rig-pad" aria-hidden />
     </>
   );
