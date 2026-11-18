@@ -139,3 +139,37 @@ for (const s of seeds) {
 }
 
 console.log("Banco pronto.");
+
+// Rigs (painel "Minhas rigs"): a rig chama o site; guardamos só hashes de segredo e convite.
+await sql`create table if not exists rigs (
+  id serial primary key,
+  nome text not null,
+  segredo_hash text unique not null,
+  codigo text,
+  estado text not null default 'pendente',
+  dono_email text,
+  versao text,
+  ultimo_status jsonb,
+  visto_em timestamptz,
+  criada_em timestamptz not null default now(),
+  confirmada_em timestamptz
+)`;
+await sql`create table if not exists rig_convites (
+  id serial primary key,
+  hash text unique not null,
+  expira_em timestamptz not null,
+  usado_em timestamptz,
+  criado_em timestamptz not null default now()
+)`;
+await sql`create table if not exists rig_comandos (
+  id serial primary key,
+  rig_id int not null references rigs(id) on delete cascade,
+  tipo text not null,
+  criado_em timestamptz not null default now(),
+  entregue_em timestamptz,
+  concluido_em timestamptz,
+  ok boolean,
+  resultado text
+)`;
+await sql`create index if not exists rig_comandos_pend_idx on rig_comandos(rig_id, entregue_em)`;
+console.log("rigs ok");
