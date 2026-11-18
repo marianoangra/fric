@@ -37,17 +37,19 @@ Guardiã e da Leila, com Linux comum instalado do zero pelo pendrive.
 ## Como funciona
 
 ### Identidade e pareamento
-1. No primeiro boot, o agente gera `segredo` (32 bytes aleatórios) e grava
+A rig não tem monitor (decisão do user): tudo é acompanhado pelo painel. Como ninguém vê um
+código na tela da rig, o pareamento principal é por **convite no pendrive**:
+1. No painel, botão "Nova rig" gera um convite de uso único (válido 7 dias). O site guarda só
+   o hash. O convite vai no arquivo de configuração do pendrive.
+2. No primeiro boot, o agente gera `segredo` (32 bytes aleatórios) e grava
    `/var/lib/fric-rig/identidade.json` (0600, root).
-2. Chama `POST /api/rigs/registrar` com `{ segredo, nome_sugerido (hostname), versao }`.
-   O site guarda só `sha256(segredo)`, cria a rig como `pendente` e devolve `{ rig_id, codigo }`
-   (código curto legível, ex. `K7-4Q2`, sem letras ambíguas).
-3. O agente mostra o código no log e na tela do monitor (`/etc/issue`, aparece no console).
-4. No painel aparece "Rig nova esperando — código K7-4Q2 — é sua?" [Confirmar] [Recusar].
-   Confirmar → `ativa`. Recusar → `recusada` (o segredo dela nunca mais vale).
+3. Chama `POST /api/rigs/registrar` com `{ segredo, convite, nome_sugerido (hostname), versao }`.
+   O site guarda só `sha256(segredo)`. Convite válido → rig nasce `ativa` e o convite é queimado.
+4. Sem convite ou convite inválido → rig nasce `pendente`, com código curto (ex. `K7-4Q2`)
+   mostrado no painel: "Rig nova esperando — é sua?" [Confirmar] [Recusar]. É o caminho de
+   reserva (e o de rigs de terceiros no futuro). Recusar → `recusada` (segredo nunca mais vale).
 5. Pendentes expiram em 24 h; no máximo 5 pendentes ao mesmo tempo (o resto recebe 429).
-   Rig que perdeu a identidade (reinstalada) simplesmente se registra de novo; a antiga fica
-   offline e pode ser removida no painel.
+   Rig reinstalada se registra de novo; a antiga fica offline e pode ser removida no painel.
 
 ### Pulso (a cada 60 s)
 `POST /api/rigs/pulso`, `Authorization: Bearer <segredo>`, corpo JSON validado por zod e
@@ -59,7 +61,8 @@ limitado a 8 KB:
   ollama: { ok, modelos_carregados: [..] },
   guardia: { servico: "ativa"|"parada"|"falhou", pausada, ts_ultimo_ciclo, postura, cor,
              motivo, pct_protegido, margem } | null,
-  leila: { gate_ok } }
+  leila: { gate_ok },
+  instalacao: { etapa, ok, erro, saida } | null }   // só durante o 1º boot
 ```
 Resposta: `{ comandos: [{ id, tipo }] }` só se a rig estiver `ativa`; pendente/recusada recebe
 `{ estado }` e nenhum comando. O site grava `ultimo_status` (jsonb) e `visto_em`.
@@ -101,16 +104,36 @@ Mudança pequena na Guardiã: ao fim de cada ciclo ela grava `/run/guardia/statu
 - Endereço do site em `/etc/fric-rig.env` (`FRIC_URL=https://fric.com.br`).
 - Sem internet: segue tentando com espera crescente até 5 min; nunca trava a Guardiã.
 
-### Pendrive e instalação (sem HiveOS)
+### Pendrive e instalação (sem HiveOS, sem monitor)
+Decisão do user: Ubuntu se instala sozinho e tudo é acompanhado pelo painel.
 - Sistema: **Ubuntu Server 24.04 LTS** (escolha minha: o mais documentado para amdgpu, Ollama e
-  Tailscale).
-- Antes de apagar o HiveOS (o user roda no shell do HiveOS): salvar `/etc/leila-gate.env` e
-  `/etc/guardia.env` (se existir) no pendrive; anotar `ollama ps` (GPU ou CPU hoje), `lscpu`,
-  `free -h`, `lsblk`.
-- Depois do Ubuntu instalado: um `instalar-tudo.sh` do pendrive instala Ollama, baixa
-  qwen3:8b, cria os modelos `leila` e `guardia`, reinstala leila-gate (com o token salvo),
-  Tailscale + Funnel (login aparece como link na tela), Guardiã e agente `fric-rig`.
-- Guia passo a passo em texto, como o atual, substituindo `GUARDIA-instalar-na-rig.txt`.
+  Tailscale), com **autoinstall**: `autoinstall.yaml` na raiz do pendrive e `autoinstall` na
+  linha do kernel do `grub.cfg` do pendrive (sem isso o 24.04 para pedindo confirmação na tela).
+- **Antes de apagar o HiveOS** (o user roda no shell.hiveos.farm, eu passo os comandos):
+  - salvar `/etc/leila-gate.env` (token da Leila) e `/etc/guardia.env` se existir;
+  - anotar: `lsblk -o NAME,SIZE,MODEL,SERIAL,TRAN` (qual disco recebe o Ubuntu e qual é o
+    pendrive), `ls /sys/firmware/efi` (UEFI ou legado), `ip -br a` (cabo ou Wi-Fi),
+    `ollama ps` (GPU ou CPU hoje), `lscpu`, `free -h`;
+  - fazer a rig **dar boot pelo pendrive sem BIOS na tela**: em UEFI, `efibootmgr` + `BootNext`
+    apontando para o pendrive, e reboot. Se não houver entrada UEFI para o pendrive, plano B é
+    emprestar um monitor por 5 minutos só para escolher o boot.
+- O `autoinstall.yaml` instala no disco identificado pelo serial (nunca "o maior disco"), cria o
+  usuário com senha que o user define, hostname `rig2e3530`, SSH ligado, e copia do pendrive
+  para o disco: agente `fric-rig`, `instalar-tudo.sh`, os pacotes da Guardiã e da Leila e os
+  arquivos de configuração.
+- **Primeiro boot:** o agente `fric-rig` sobe ANTES de tudo (só biblioteca padrão, não precisa
+  de internet além do site), se registra com o convite e passa a mandar no pulso o campo
+  `instalacao: { etapa, ok, erro }`. Então `instalar-tudo.sh` (serviço oneshot) roda:
+  Ollama → qwen3:8b (~5 GB) → modelos `leila` e `guardia` → leila-gate (token salvo) →
+  Tailscale com **auth key** (gerada pelo user no painel do Tailscale, vai no pendrive) +
+  `funnel --bg 11435` → Guardiã (em modo observação, testnet) → `checar_testnet.py`, com a
+  saída enviada ao painel. Cada etapa aparece no painel; erro para ali e mostra o motivo.
+- **Tailscale:** apagar o nó antigo `rig2e3530` no painel do Tailscale antes, para o novo
+  herdar o nome e a URL `https://rig2e3530.tail4a859f.ts.net` (que é o LEILA_URL na Vercel).
+- Pendrive carrega segredos (chave testnet, token da Leila, auth key, convite): o guia manda
+  formatá-lo no fim. Auth key do Tailscale de uso único e com validade curta.
+- Guia passo a passo em texto, substituindo `GUARDIA-instalar-na-rig.txt`.
+- Ordem: o site com o painel precisa estar no ar ANTES de gravar o pendrive (o convite vem dele).
 
 ## Riscos conhecidos
 - **Ollama na RX 590:** ROCm não suporta Polaris (gfx803). Caminho: backend Vulkan do Ollama.
