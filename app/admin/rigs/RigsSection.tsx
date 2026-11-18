@@ -58,7 +58,9 @@ function Instalacao({ i }: { i: NonNullable<NonNullable<RigPainel["ultimo_status
           return <li key={e} className={st}>{NOME_ETAPA[e]}</li>;
         })}
       </ol>
-      {i.erro && <p className="rig-erro">Parou em {NOME_ETAPA[i.etapa] ?? i.etapa}: {i.erro}</p>}
+      {i.erro && (i.ok === false
+        ? <p className="rig-erro">Parou em {NOME_ETAPA[i.etapa] ?? i.etapa}: {i.erro}</p>
+        : <p className="rig-espera">{NOME_ETAPA[i.etapa] ?? i.etapa}: {i.erro}</p>)}
       {i.saida && <pre className="rig-pre">{i.saida}</pre>}
     </div>
   );
