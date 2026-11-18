@@ -5,9 +5,9 @@ import { adminComandoRig, adminConfirmarRig, adminRecusarRig, adminRemoverRig } 
 import { ago } from "@/lib/format";
 import { AutoRefresh, BotaoReiniciarRig, NovoConvite } from "./RigsClient";
 
-const ETAPAS = ["apt", "ollama", "modelo", "leila", "tailscale", "guardia", "testnet", "pronto"];
+const ETAPAS = ["apt", "driver", "ollama", "modelo", "leila", "tailscale", "guardia", "testnet", "pronto"];
 const NOME_ETAPA: Record<string, string> = {
-  apt: "Sistema", ollama: "Ollama", modelo: "Modelo (~5 GB)", leila: "Leila", tailscale: "Túnel",
+  apt: "Sistema", driver: "Driver da placa", ollama: "Ollama", modelo: "Modelo (~5 GB)", leila: "Leila", tailscale: "Túnel",
   guardia: "Guardiã", testnet: "Teste testnet", pronto: "Pronto",
 };
 const NOME_CMD: Record<string, string> = {
