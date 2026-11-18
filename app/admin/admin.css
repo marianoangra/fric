@@ -63,3 +63,39 @@
   .bars { gap: 4px }
   .bar .d { font-size: 9px }
 }
+
+/* Minhas rigs */
+.rig-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 4px }
+.rig-top h2 { margin-bottom: 10px }
+.rig-convite { display: grid; gap: 8px; justify-items: end; max-width: 100% }
+.rig-convite-box { display: grid; gap: 6px; background: var(--sun-soft); border-radius: var(--r-sm); padding: 10px 12px; font-size: 13px; max-width: 520px }
+.rig-convite-box code { font: 600 13px ui-monospace, monospace; word-break: break-all; background: var(--surface); padding: 6px 8px; border-radius: 6px }
+.rig-convite-box .btn { justify-self: start }
+.rig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 12px }
+.rig-card { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 14px; display: grid; gap: 10px; min-width: 0 }
+.rig-card.off { background: var(--surface-2) }
+.rig-card p { margin: 0 }
+.rig-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; font-size: 13px }
+.rig-head b { font: 800 15px var(--display); display: flex; gap: 7px; align-items: center }
+.rig-head .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block }
+.rig-codigo { font: 800 30px/1 ui-monospace, monospace; letter-spacing: .08em }
+.rig-dados { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; margin: 0; font-size: 13px }
+.rig-dados dt { color: var(--muted); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em }
+.rig-dados dd { margin: 0; font-weight: 600 }
+.rig-lbl { display: block; color: var(--muted); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px }
+.rig-guardia p { font-size: 13px }
+.rig-motivo { color: var(--ink-2); font-style: italic; margin-top: 4px !important }
+.pill.gray { background: var(--surface-2); color: var(--muted) }
+.rig-acts { display: flex; gap: 6px; flex-wrap: wrap }
+.rig-acts .btn, .rig-pend .btn { gap: 6px }
+.btn.rig-danger { background: var(--rose); color: #fff }
+.rig-espera { font-size: 12.5px; color: var(--sun) }
+.rig-erro { font-size: 12.5px; color: var(--rose) }
+.rig-pre { margin: 6px 0 0; max-height: 260px; overflow: auto; font: 12px/1.45 ui-monospace, monospace; background: var(--surface-2); border-radius: 8px; padding: 10px; white-space: pre-wrap; word-break: break-word }
+.rig-log summary { cursor: pointer; font-size: 13px; font-weight: 600 }
+.rig-etapas { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px }
+.rig-etapas li { font-size: 12px; padding: 3px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted) }
+.rig-etapas li.ok { background: var(--mint-soft); color: var(--mint) }
+.rig-etapas li.agora { background: var(--sun-soft); color: var(--sun); font-weight: 700 }
+.rig-etapas li.erro { background: var(--rose-soft); color: var(--rose); font-weight: 700 }
+.rig-remover { justify-self: start }

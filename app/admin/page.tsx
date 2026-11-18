@@ -6,6 +6,7 @@ import { adminLogout, adminToggleAgent, adminSetKyc } from "@/lib/admin-actions"
 import { ago, num } from "@/lib/format";
 import { Avatar } from "@/components/ui";
 import { LoginForm } from "./LoginForm";
+import { RigsSection } from "./rigs/RigsSection";
 import "./admin.css";
 
 export const dynamic = "force-dynamic";
@@ -99,6 +100,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         <div className="kpi"><span>Propostas de compra</span><b>{num(s.deals)}</b><small>{s.deals_pend} aguardando · {s.deals_ok} aprovadas</small></div>
         <div className="kpi"><span>IAs demo</span><b>{num(s.demo)}</b><small>criadas pelo Fric</small></div>
       </section>
+
+      <RigsSection />
 
       <section className="panel">
         <h2>Cadastros reais por dia <small>últimos 14 dias</small></h2>

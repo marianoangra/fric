@@ -79,3 +79,42 @@ export async function gravarResultado(rigId: number, r: z.infer<typeof resultado
     where id = ${r.comando_id} and rig_id = ${rigId} returning id`;
   return rows.length > 0;
 }
+
+// ---------- Admin ----------
+
+export type RigPainel = {
+  id: number; nome: string; codigo: string | null; estado: EstadoRig; versao: string | null;
+  ultimo_status: Pulso | null; visto_em: string | null; criada_em: string;
+  em_andamento: { id: number; tipo: string; criado_em: string; entregue_em: string | null }[];
+  ultimo_log: { texto: string | null; ok: boolean | null; concluido_em: string } | null;
+  ultimo_erro: { tipo: string; texto: string | null; concluido_em: string } | null;
+};
+
+/** Rigs ativas e pendentes (recusadas somem), com o que está em andamento e o último log. */
+export async function listarRigs(): Promise<RigPainel[]> {
+  const rigs = await sql`select id, nome, codigo, estado, versao, ultimo_status, visto_em, criada_em
+    from rigs where estado <> 'recusada'
+      and not (estado = 'pendente' and criada_em < now() - make_interval(hours => ${PENDENTE_EXPIRA_H}))
+    order by estado = 'pendente' desc, criada_em`;
+  if (!rigs.length) return [];
+  const ids = rigs.map((r) => r.id);
+  const [andamento, logs, erros] = await Promise.all([
+    sql`select id, rig_id, tipo, criado_em, entregue_em from rig_comandos
+      where rig_id = any(${ids}) and concluido_em is null
+        and (entregue_em is not null or criado_em > now() - make_interval(secs => ${COMANDO_VALIDO_S}))
+        and criado_em > now() - interval '1 hour'
+      order by id`,
+    sql`select distinct on (rig_id) rig_id, resultado as texto, ok, concluido_em from rig_comandos
+      where rig_id = any(${ids}) and tipo = 'ver_log' and concluido_em is not null
+      order by rig_id, concluido_em desc`,
+    sql`select distinct on (rig_id) rig_id, tipo, resultado as texto, concluido_em from rig_comandos
+      where rig_id = any(${ids}) and ok = false and concluido_em > now() - interval '1 hour'
+      order by rig_id, concluido_em desc`,
+  ]);
+  return rigs.map((r) => ({
+    ...(r as Omit<RigPainel, "em_andamento" | "ultimo_log" | "ultimo_erro">),
+    em_andamento: andamento.filter((c) => c.rig_id === r.id) as RigPainel["em_andamento"],
+    ultimo_log: (logs.find((l) => l.rig_id === r.id) as RigPainel["ultimo_log"]) ?? null,
+    ultimo_erro: (erros.find((l) => l.rig_id === r.id) as RigPainel["ultimo_erro"]) ?? null,
+  }));
+}
