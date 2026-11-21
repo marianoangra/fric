@@ -36,6 +36,17 @@ test("pulsoSchema aceita completo, gpu null, guardia null e instalacao", () => {
   assert.ok(pulsoSchema.safeParse({ ...pulsoCompleto, cpu: { temp_c: null, carga_1m: 0.1 } }).success);
 });
 
+test("pulsoSchema: terminal_url só do Tailscale, o resto vira null sem derrubar o pulso", () => {
+  const ok = pulsoSchema.safeParse({ ...pulsoCompleto, terminal_url: "https://rig1660s.tail1234.ts.net/" });
+  assert.equal(ok.success && ok.data.terminal_url, "https://rig1660s.tail1234.ts.net/");
+  for (const ruim of ["https://evil.com/", "http://rig1660s.tail1234.ts.net/", "javascript:alert(1)", "https://x.ts.net.evil.com/"]) {
+    const r = pulsoSchema.safeParse({ ...pulsoCompleto, terminal_url: ruim });
+    assert.ok(r.success);
+    assert.equal(r.data.terminal_url, null);
+  }
+  assert.equal(pulsoSchema.safeParse(pulsoCompleto).data?.terminal_url, undefined);
+});
+
 test("pulsoSchema rejeita lixo", () => {
   assert.equal(pulsoSchema.safeParse({ uptime_s: "x" }).success, false);
   assert.equal(pulsoSchema.safeParse("oi").success, false);

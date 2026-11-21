@@ -1,4 +1,4 @@
-import { FileText, Pause, Play, RotateCcw } from "lucide-react";
+import { FileText, Pause, Play, RotateCcw, SquareTerminal } from "lucide-react";
 import { listarRigs, type RigPainel } from "@/lib/rigs";
 import { estaOnline } from "@/lib/rigs-core";
 import { adminComandoRig, adminConfirmarRig, adminRecusarRig, adminRemoverRig } from "@/lib/admin-actions";
@@ -116,6 +116,12 @@ function Ativa({ r }: { r: RigPainel }) {
         <Cmd id={r.id} tipo="reiniciar_guardia" disabled={!g}><RotateCcw size={15} aria-hidden /> Reiniciar Guardiã</Cmd>
         <BotaoReiniciarRig id={r.id} />
         <Cmd id={r.id} tipo="ver_log"><FileText size={15} aria-hidden /> Ver log</Cmd>
+        {s?.terminal_url && (
+          <a className="btn outline sm" href={s.terminal_url} target="_blank" rel="noopener noreferrer"
+             title="Abre o terminal da rig numa aba nova (pede a senha do terminal)">
+            <SquareTerminal size={15} aria-hidden /> Terminal
+          </a>
+        )}
       </div>
       {esperando.length > 0 && <p className="rig-espera">Aguardando a rig: {esperando.join(", ")}…</p>}
       {r.ultimo_erro && <p className="rig-erro">{NOME_CMD[r.ultimo_erro.tipo] ?? r.ultimo_erro.tipo} falhou {ha(r.ultimo_erro.concluido_em)}: {r.ultimo_erro.texto}</p>}

@@ -56,6 +56,9 @@ export const pulsoSchema = z.object({
     erro: txt(500).nullable(),
     saida: txt(4000).nullable(),
   }).nullable().optional(),
+  // Botão Terminal no /admin: só endereço do Tailscale (rig comprometida não vira link de phishing).
+  // Endereço inválido vira null em vez de derrubar o pulso inteiro.
+  terminal_url: z.string().max(200).regex(/^https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.ts\.net\/?$/).nullable().optional().catch(null),
 });
 export type Pulso = z.infer<typeof pulsoSchema>;
 
